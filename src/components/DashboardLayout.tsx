@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageToggle from "@/components/LanguageToggle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import { getCurrentUser, type User } from "@/services/users.service";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -63,6 +65,24 @@ const DashboardLayout = ({
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
+  const { accessToken, logout } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    getCurrentUser(accessToken)
+      .then(setUser)
+      .catch(() => {});
+  }, [accessToken]);
+
+  const initials = user
+    ? user.full_name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "";
 
   return (
     <div className="min-h-screen flex bg-secondary/30">
@@ -120,20 +140,14 @@ const DashboardLayout = ({
           </nav>
 
           <div className="absolute bottom-6 left-6 right-6">
-            <Link to="/login">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-5 h-5" />
-
-                {/* ================================
-                    🌍 TRANSLATION: Actions
-                    Key: dashboard.layout.actions.signOut
-                   ================================ */}
-                <span>{t("dashboard.layout.actions.signOut")}</span>
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
+              onClick={logout}
+            >
+              <LogOut className="w-5 h-5" />
+              <span>{t("dashboard.layout.actions.signOut")}</span>
+            </Button>
           </div>
         </div>
       </aside>
@@ -168,7 +182,7 @@ const DashboardLayout = ({
               <ThemeToggle />
               <LanguageToggle />
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold text-sm">
-                JD
+                {initials}
               </div>
             </div>
           </div>

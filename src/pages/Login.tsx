@@ -4,24 +4,45 @@
 // ================================
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Mail, Lock } from "lucide-react";
+import { Zap, Mail, Lock, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import { ApiRequestError } from "@/lib/api";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageToggle from "@/components/LanguageToggle";
 
 const Login = () => {
   const { t } = useLanguage();
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login:", { email, password });
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await login({ email, password });
+      navigate("/dashboard");
+    } catch (err) {
+      if (err instanceof ApiRequestError) {
+        setError(err.detail);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -63,6 +84,13 @@ const Login = () => {
               🌍 TRANSLATION: Form
              ================================ */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error message */}
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">{t("pages.login.form.email.label")}</Label>
@@ -117,8 +145,13 @@ const Login = () => {
               type="submit"
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
               size="lg"
+              disabled={isSubmitting}
             >
-              {t("pages.login.form.submit")}
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("pages.login.form.submit")
+              )}
             </Button>
           </form>
 

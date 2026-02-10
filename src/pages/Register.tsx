@@ -4,28 +4,58 @@
 // ================================
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Mail, Lock, User } from "lucide-react";
+import { Zap, Mail, Lock, User, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { registerRequest } from "@/services/auth.service";
+import { ApiRequestError } from "@/lib/api";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageToggle from "@/components/LanguageToggle";
 
 const Register = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Register:", formData);
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await registerRequest({
+        full_name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/login");
+    } catch (err) {
+      if (err instanceof ApiRequestError) {
+        setError(err.detail);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +97,13 @@ const Register = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error message */}
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
             {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="name">
@@ -145,8 +182,13 @@ const Register = () => {
               type="submit"
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
               size="lg"
+              disabled={isSubmitting}
             >
-              {t("pages.register.actions.submit")}
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("pages.register.actions.submit")
+              )}
             </Button>
           </form>
 

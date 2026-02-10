@@ -3,34 +3,142 @@
 // Namespace: pages.profile.*
 // ================================
 
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
   Camera,
   Mail,
-  Phone,
-  MapPin,
-  Building,
   Calendar,
   Shield,
   Edit3,
+  User as UserIcon,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import { getCurrentUser, updateCurrentUser, type User } from "@/services/users.service";
+import { ApiRequestError } from "@/lib/api";
 
 const Profile = () => {
   const { t } = useLanguage();
+  const { accessToken } = useAuth();
+  const navigate = useNavigate();
 
-  const profileData = {
-    name: "John Doe",
-    email: "john.doe@company.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    company: "Tech Innovations Inc.",
-    role: "Product Manager",
-    joinDate: "January 2023",
-    plan: "Professional",
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Edit mode state
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editFullName, setEditFullName] = useState("");
+  const [editUsername, setEditUsername] = useState("");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const startEditing = () => {
+    if (!user) return;
+    setEditFullName(user.full_name);
+    setEditUsername(user.username);
+    setSaveError(null);
+    setSaveSuccess(false);
+    setEditing(true);
   };
+
+  const cancelEditing = () => {
+    setEditing(false);
+    setSaveError(null);
+    setSaveSuccess(false);
+  };
+
+  const handleSave = async () => {
+    if (!accessToken || !user) return;
+    try {
+      setSaving(true);
+      setSaveError(null);
+      setSaveSuccess(false);
+      const updated = await updateCurrentUser(accessToken, {
+        full_name: editFullName,
+        username: editUsername,
+      });
+      setUser(updated);
+      setEditing(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      if (err instanceof ApiRequestError) {
+        setSaveError(err.detail);
+      } else {
+        setSaveError("Failed to update profile.");
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getCurrentUser(accessToken);
+        setUser(data);
+      } catch (err) {
+        if (err instanceof ApiRequestError) {
+          setError(err.detail);
+        } else {
+          setError("Failed to load profile.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [accessToken, navigate]);
+
+  if (loading) {
+    return (
+      <DashboardLayout title={t("pages.profile.title")} subtitle={t("pages.profile.subtitle")}>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <DashboardLayout title={t("pages.profile.title")} subtitle={t("pages.profile.subtitle")}>
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <AlertCircle className="w-10 h-10 text-destructive" />
+          <p className="text-destructive font-medium">{error ?? "User not found."}</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const initials = user.full_name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  const joinDate = new Date(user.created_at).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <DashboardLayout
@@ -53,7 +161,7 @@ const Profile = () => {
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-3xl font-bold text-primary-foreground border-4 border-card">
-                  JD
+                  {initials}
                 </div>
                 <button className="absolute bottom-0 right-0 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
                   <Camera className="w-4 h-4 text-muted-foreground" />
@@ -61,17 +169,21 @@ const Profile = () => {
               </div>
               <div className="flex-1 sm:pb-2">
                 <h2 className="text-2xl font-bold text-foreground">
-                  {profileData.name}
+                  {user.full_name}
                 </h2>
                 <p className="text-muted-foreground">
-                  {profileData.role} {t("pages.profile.at")}{" "}
-                  {profileData.company}
+                  {user.role ?? "No role assigned"}
                 </p>
               </div>
-              <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 gap-2 w-full sm:w-auto">
-                <Edit3 className="w-4 h-4" />
-                {t("pages.profile.actions.edit")}
-              </Button>
+              {!editing && (
+                <Button
+                  onClick={startEditing}
+                  className="bg-gradient-to-r from-primary to-accent hover:opacity-90 gap-2 w-full sm:w-auto"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  {t("pages.profile.actions.edit")}
+                </Button>
+              )}
             </div>
           </div>
         </motion.div>
@@ -93,11 +205,20 @@ const Profile = () => {
                 <label className="text-sm text-muted-foreground block mb-2">
                   {t("pages.profile.fields.fullName")}
                 </label>
-                <input
-                  type="text"
-                  defaultValue={profileData.name}
-                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl"
-                />
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={editing ? editFullName : user.full_name}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    disabled={!editing}
+                    className={`w-full pl-12 pr-4 py-3 border border-border rounded-xl ${
+                      editing
+                        ? "bg-background focus:ring-2 focus:ring-primary/50 outline-none"
+                        : "bg-secondary/50"
+                    }`}
+                  />
+                </div>
               </div>
 
               <div>
@@ -108,36 +229,29 @@ const Profile = () => {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="email"
-                    defaultValue={profileData.email}
-                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl"
+                    defaultValue={user.email}
+                    disabled
+                    className="w-full pl-12 pr-4 py-3 bg-secondary/30 border border-border rounded-xl text-muted-foreground"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="text-sm text-muted-foreground block mb-2">
-                  {t("pages.profile.fields.phone")}
+                  Username
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="tel"
-                    defaultValue={profileData.phone}
-                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">
-                  {t("pages.profile.fields.location")}
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
-                    defaultValue={profileData.location}
-                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl"
+                    value={editing ? editUsername : user.username}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                    disabled={!editing}
+                    className={`w-full pl-12 pr-4 py-3 border border-border rounded-xl ${
+                      editing
+                        ? "bg-background focus:ring-2 focus:ring-primary/50 outline-none"
+                        : "bg-secondary/50"
+                    }`}
                   />
                 </div>
               </div>
@@ -158,27 +272,17 @@ const Profile = () => {
             <div className="space-y-5">
               <div>
                 <label className="text-sm text-muted-foreground block mb-2">
-                  {t("pages.profile.fields.company")}
-                </label>
-                <div className="relative">
-                  <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="text"
-                    defaultValue={profileData.company}
-                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">
                   {t("pages.profile.fields.role")}
                 </label>
-                <input
-                  type="text"
-                  defaultValue={profileData.role}
-                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl"
-                />
+                <div className="relative">
+                  <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    defaultValue={user.role ?? "No role assigned"}
+                    disabled
+                    className="w-full pl-12 pr-4 py-3 bg-secondary/30 border border-border rounded-xl text-muted-foreground"
+                  />
+                </div>
               </div>
 
               <div>
@@ -189,7 +293,7 @@ const Profile = () => {
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
-                    defaultValue={profileData.joinDate}
+                    defaultValue={joinDate}
                     disabled
                     className="w-full pl-12 pr-4 py-3 bg-secondary/30 border border-border rounded-xl text-muted-foreground"
                   />
@@ -198,19 +302,14 @@ const Profile = () => {
 
               <div>
                 <label className="text-sm text-muted-foreground block mb-2">
-                  {t("pages.profile.fields.plan")}
+                  Status
                 </label>
                 <div className="relative">
                   <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <div className="w-full pl-12 pr-4 py-3 bg-secondary/30 border border-border rounded-xl flex items-center justify-between">
-                    <span className="text-foreground">{profileData.plan}</span>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="h-auto p-0 text-primary"
-                    >
-                      {t("pages.profile.actions.upgrade")}
-                    </Button>
+                  <div className="w-full pl-12 pr-4 py-3 bg-secondary/30 border border-border rounded-xl flex items-center">
+                    <span className={user.is_active ? "text-green-500 font-medium" : "text-yellow-500 font-medium"}>
+                      {user.is_active ? "Active" : "Pending"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -218,20 +317,45 @@ const Profile = () => {
           </motion.div>
         </div>
 
-        {/* Action Buttons */}
-        <motion.div
-          className="flex flex-col sm:flex-row gap-3 justify-end mt-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-        >
-          <Button variant="outline" className="order-2 sm:order-1">
-            {t("pages.profile.actions.cancel")}
-          </Button>
-          <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 order-1 sm:order-2">
-            {t("pages.profile.actions.save")}
-          </Button>
-        </motion.div>
+        {/* Save / Cancel / Success / Error */}
+        {editing && (
+          <motion.div
+            className="mt-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {saveError && (
+              <div className="flex items-center gap-2 text-destructive mb-4 bg-destructive/10 px-4 py-3 rounded-xl">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <p className="text-sm font-medium">{saveError}</p>
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <Button variant="outline" onClick={cancelEditing} disabled={saving}>
+                {t("pages.profile.actions.cancel")}
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 gap-2"
+              >
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {t("pages.profile.actions.save")}
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {saveSuccess && !editing && (
+          <motion.div
+            className="mt-4 bg-green-500/10 text-green-600 px-4 py-3 rounded-xl text-sm font-medium text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            Profile updated successfully!
+          </motion.div>
+        )}
       </div>
     </DashboardLayout>
   );
