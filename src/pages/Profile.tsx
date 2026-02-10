@@ -81,10 +81,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (!accessToken) {
-      navigate("/login");
-      return;
-    }
+    if (!accessToken) return;
 
     const fetchProfile = async () => {
       try {
