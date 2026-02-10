@@ -25,7 +25,7 @@ import { ApiRequestError } from "@/lib/api";
 
 const Profile = () => {
   const { t } = useLanguage();
-  const { accessToken } = useAuth();
+  const { getAccessToken } = useAuth();
   const navigate = useNavigate();
 
   const [user, setUser] = useState<User | null>(null);
@@ -56,12 +56,14 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    if (!accessToken || !user) return;
+    if (!user) return;
+    const token = await getAccessToken();
+    if (!token) return;
     try {
       setSaving(true);
       setSaveError(null);
       setSaveSuccess(false);
-      const updated = await updateCurrentUser(accessToken, {
+      const updated = await updateCurrentUser(token, {
         full_name: editFullName,
         username: editUsername,
       });
@@ -81,13 +83,13 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (!accessToken) return;
-
     const fetchProfile = async () => {
+      const token = await getAccessToken();
+      if (!token) return;
       try {
         setLoading(true);
         setError(null);
-        const data = await getCurrentUser(accessToken);
+        const data = await getCurrentUser(token);
         setUser(data);
       } catch (err) {
         if (err instanceof ApiRequestError) {
@@ -101,7 +103,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [accessToken, navigate]);
+  }, [getAccessToken]);
 
   if (loading) {
     return (
