@@ -36,7 +36,7 @@ function decodePayload(token: string): Record<string, unknown> | null {
 }
 
 /** Returns `true` when the token expires in less than `bufferMs` milliseconds. */
-function isTokenExpiringSoon(token: string, bufferMs = 60_000): boolean {
+function isTokenExpiringSoon(token: string, bufferMs = 5_000): boolean {
   const payload = decodePayload(token);
   if (!payload || typeof payload.exp !== "number") return true;
   return payload.exp * 1000 - Date.now() < bufferMs;
@@ -165,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return refreshPromiseRef.current;
   }, [refreshAccessToken]);
 
-  /* ---- proactive refresh before expiry ---- */
+  /* ---- proactive refresh before access token expiry ---- */
   useEffect(() => {
     if (!tokens?.accessToken) return;
 
@@ -173,8 +173,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!payload || typeof payload.exp !== "number") return;
 
     const expiresIn = payload.exp * 1000 - Date.now();
-    // Refresh 60 s before expiry
-    const refreshIn = Math.max(expiresIn - 60_000, 0);
+    // Refresh 5 s before expiry
+    const refreshIn = Math.max(expiresIn - 5_000, 0);
 
     const timer = setTimeout(() => {
       getAccessToken(); // triggers refresh
@@ -182,6 +182,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => clearTimeout(timer);
   }, [tokens?.accessToken, getAccessToken]);
+
+  /* ---- force logout when refresh token expires ---- */
+  useEffect(() => {
+    if (!tokens?.refreshToken) return;
+
+    const payload = decodePayload(tokens.refreshToken);
+    if (!payload || typeof payload.exp !== "number") return;
+
+    const expiresIn = payload.exp * 1000 - Date.now();
+    if (expiresIn <= 0) {
+      logout();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      logout();
+    }, expiresIn);
+
+    return () => clearTimeout(timer);
+  }, [tokens?.refreshToken, logout]);
 
   /* ---- context value ---- */
   const value = useMemo<AuthContextValue>(

@@ -65,15 +65,17 @@ const DashboardLayout = ({
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
-  const { accessToken, logout } = useAuth();
+  const { getAccessToken, logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!accessToken) return;
-    getCurrentUser(accessToken)
-      .then(setUser)
-      .catch(() => {});
-  }, [accessToken]);
+    let cancelled = false;
+    getAccessToken().then((token) => {
+      if (!token || cancelled) return;
+      getCurrentUser(token).then((u) => { if (!cancelled) setUser(u); }).catch(() => {});
+    });
+    return () => { cancelled = true; };
+  }, [getAccessToken]);
 
   const initials = user
     ? user.full_name
