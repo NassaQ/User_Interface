@@ -67,8 +67,28 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 /*  Provider                                                           */
 /* ------------------------------------------------------------------ */
 
+const STORAGE_KEY = "__nassaq_tokens";
+
+function loadTokens(): Tokens | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.accessToken && parsed?.refreshToken) return parsed as Tokens;
+  } catch { /* ignore */ }
+  return null;
+}
+
+function saveTokens(t: Tokens | null) {
+  if (t) {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(t));
+  } else {
+    sessionStorage.removeItem(STORAGE_KEY);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [tokens, setTokens] = useState<Tokens | null>(null);
+  const [tokens, setTokens] = useState<Tokens | null>(loadTokens);
   const [isLoading, setIsLoading] = useState(false);
 
   // Ref to avoid stale closures in the refresh logic
@@ -81,14 +101,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---- login ---- */
   const login = useCallback(async (credentials: LoginCredentials) => {
     const data: TokenLogin = await loginRequest(credentials);
-    setTokens({
+    const newTokens: Tokens = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
-    });
+    };
+    saveTokens(newTokens);
+    setTokens(newTokens);
   }, []);
 
   /* ---- logout ---- */
   const logout = useCallback(() => {
+    saveTokens(null);
     setTokens(null);
     refreshPromiseRef.current = null;
   }, []);
@@ -110,6 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         accessToken: data.access_token,
         refreshToken: current.refreshToken, // keep the same refresh token
       };
+      saveTokens(newTokens);
       setTokens(newTokens);
       tokensRef.current = newTokens;
       return data.access_token;
