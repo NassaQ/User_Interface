@@ -11,6 +11,7 @@ import {
   Sparkles,
   History,
   User,
+  Users,
   Settings,
   HelpCircle,
   CreditCard,
@@ -43,6 +44,7 @@ const navItems = [
   },
   { icon: Sparkles, labelKey: "dashboard.layout.nav.studio", path: "/studio" },
   { icon: History, labelKey: "dashboard.layout.nav.history", path: "/history" },
+  { icon: Users, labelKey: "dashboard.layout.nav.users", path: "/users" },
   { icon: User, labelKey: "dashboard.layout.nav.profile", path: "/profile" },
   {
     icon: Settings,
