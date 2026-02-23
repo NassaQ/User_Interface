@@ -35,15 +35,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/context/LanguageContext";
-import {
-  Mail,
-  MoreHorizontal,
-  Pencil,
-  Search,
-  Trash2,
-  Users as UsersIcon,
-} from "lucide-react";
+import { Mail, Search, Users as UsersIcon } from "lucide-react";
 
 type UserStatus = "active" | "inactive";
 
@@ -154,6 +149,10 @@ interface UsersTableProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   onToggleStatus: (id: number, status: UserStatus) => void;
+   selectedUserIds: number[];
+   onToggleSelectUser: (id: number) => void;
+   onToggleSelectAll: (selectAll: boolean) => void;
+   onUserClick: (user: User) => void;
 }
 
 const UsersFilters = ({
@@ -250,9 +249,7 @@ const UsersFilters = ({
         <div className="text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-2">
             <UsersIcon className="h-4 w-4" />
-            {t("pages.users.summary.total", {
-              count: counts.all,
-            })}
+            {t("pages.users.summary.total")} {counts.all}
           </span>
         </div>
       </div>
@@ -267,6 +264,10 @@ const UsersTable = ({
   pageSize,
   onPageChange,
   onToggleStatus,
+  selectedUserIds,
+  onToggleSelectUser,
+  onToggleSelectAll,
+  onUserClick,
 }: UsersTableProps) => {
   const { t } = useLanguage();
 
@@ -278,6 +279,8 @@ const UsersTable = ({
     if (nextPage < 1 || nextPage > totalPages) return;
     onPageChange(nextPage);
   };
+
+  const allSelectedOnPage = users.length > 0 && users.every((user) => selectedUserIds.includes(user.id));
 
   return (
     <motion.div
@@ -293,8 +296,10 @@ const UsersTable = ({
               <TableHead className="w-10">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-border text-primary"
+                  className="h-4 w-4 rounded border-border text-primary accent-primary"
                   aria-label={t("pages.users.table.selectAll")}
+                  checked={allSelectedOnPage}
+                  onChange={(event) => onToggleSelectAll(event.target.checked)}
                 />
               </TableHead>
               <TableHead className="w-14">
@@ -303,12 +308,11 @@ const UsersTable = ({
               <TableHead>{t("pages.users.table.user")}</TableHead>
               <TableHead>{t("pages.users.table.email")}</TableHead>
               <TableHead>{t("pages.users.table.role")}</TableHead>
-              <TableHead>{t("pages.users.table.status")}</TableHead>
-              <TableHead className="w-32">
-                {t("pages.users.table.activate")}
+              <TableHead className="text-center">
+                {t("pages.users.table.status")}
               </TableHead>
-              <TableHead className="w-24 text-right">
-                {t("pages.users.table.actions")}
+              <TableHead className="w-24 text-center">
+                {t("pages.users.table.activate")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -323,14 +327,22 @@ const UsersTable = ({
                 .slice(0, 2);
 
               return (
-                <TableRow key={user.id} className="hover:bg-secondary/30">
-                  <TableCell>
+                <TableRow
+                  key={user.id}
+                  className="hover:bg-secondary/30 cursor-pointer"
+                  onClick={() => onUserClick(user)}
+                >
+                  <TableCell
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-border text-primary"
-                      aria-label={t("pages.users.table.selectUser", {
-                        name: user.name,
-                      })}
+                      className="h-4 w-4 rounded border-border text-primary accent-primary"
+                      aria-label={`${t("pages.users.table.selectUser")} ${user.name}`}
+                      checked={selectedUserIds.includes(user.id)}
+                      onChange={() => onToggleSelectUser(user.id)}
                     />
                   </TableCell>
                   <TableCell className="text-muted-foreground">
@@ -359,7 +371,7 @@ const UsersTable = ({
                       {user.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Badge
                       className="rounded-full px-2 py-0.5 text-xs font-semibold"
                       variant={isActive ? "secondary" : "destructive"}
@@ -377,41 +389,24 @@ const UsersTable = ({
                       </span>
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={isActive}
-                      onCheckedChange={(checked) =>
-                        onToggleStatus(user.id, checked ? "active" : "inactive")
-                      }
-                      aria-label={
-                        isActive
-                          ? t("pages.users.aria.deactivateUser", {
-                              name: user.name,
-                            })
-                          : t("pages.users.aria.activateUser", {
-                              name: user.name,
-                            })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        aria-label={t("pages.users.actions.editUser")}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        aria-label={t("pages.users.actions.deleteUser")}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <TableCell
+                    className="w-24 text-center"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
+                    <div className="flex justify-center">
+                      <Switch
+                        checked={isActive}
+                        onCheckedChange={(checked) =>
+                          onToggleStatus(user.id, checked ? "active" : "inactive")
+                        }
+                        aria-label={
+                          isActive
+                            ? `${t("pages.users.aria.deactivateUser")} ${user.name}`
+                            : `${t("pages.users.aria.activateUser")} ${user.name}`
+                        }
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -435,7 +430,8 @@ const UsersTable = ({
           return (
             <div
               key={user.id}
-              className="rounded-2xl border border-border bg-card p-4"
+              className="rounded-2xl border border-border bg-card p-4 cursor-pointer"
+              onClick={() => onUserClick(user)}
             >
               <div className="mb-3 flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -449,14 +445,6 @@ const UsersTable = ({
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  aria-label={t("pages.users.table.moreActions")}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
               </div>
               <div className="mb-3 flex items-center justify-between gap-2">
                 <Badge variant="secondary" className="rounded-full">
@@ -486,25 +474,8 @@ const UsersTable = ({
                   onCheckedChange={(checked) =>
                     onToggleStatus(user.id, checked ? "active" : "inactive")
                   }
+                  onClick={(event) => event.stopPropagation()}
                 />
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    aria-label={t("pages.users.actions.editUser")}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                    aria-label={t("pages.users.actions.deleteUser")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
             </div>
           );
@@ -513,11 +484,7 @@ const UsersTable = ({
 
       <div className="flex flex-col items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 text-sm text-muted-foreground sm:flex-row">
         <span>
-          {t("pages.users.pagination.summary", {
-            start: startIndex,
-            end: endIndex,
-            total,
-          })}
+          {t("pages.users.pagination.summary")} {startIndex}–{endIndex} / {total}
         </span>
 
         <Pagination>
@@ -572,6 +539,13 @@ const Users = () => {
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [page, setPage] = useState(1);
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editRole, setEditRole] = useState("");
+  const [editStatus, setEditStatus] = useState<UserStatus>("active");
 
   const filteredUsers = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -645,33 +619,194 @@ const Users = () => {
     setPage(1);
   };
 
-  return (
-    <DashboardLayout
-      title={t("pages.users.title")}
-      subtitle={t("pages.users.subtitle")}
-    >
-      <div className="mx-auto max-w-6xl">
-        <UsersFilters
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          selectedRole={selectedRole}
-          onRoleChange={handleRoleChange}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          counts={counts}
-          availableRoles={availableRoles}
-        />
+  const handleToggleSelectUser = (id: number) => {
+    setSelectedUserIds((prev) => (prev.includes(id) ? prev.filter((userId) => userId !== id) : [...prev, id]));
+  };
 
-        <UsersTable
-          users={paginatedUsers}
-          page={currentPage}
-          total={total}
-          pageSize={PAGE_SIZE}
-          onPageChange={setPage}
-          onToggleStatus={handleToggleStatus}
-        />
-      </div>
-    </DashboardLayout>
+  const handleToggleSelectAll = (selectAll: boolean) => {
+    if (selectAll) {
+      const idsOnPage = paginatedUsers.map((user) => user.id);
+      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...idsOnPage])));
+    } else {
+      const idsOnPageSet = new Set(paginatedUsers.map((user) => user.id));
+      setSelectedUserIds((prev) => prev.filter((id) => !idsOnPageSet.has(id)));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedUserIds.length === 0) return;
+    setUsers((prev) => prev.filter((user) => !selectedUserIds.includes(user.id)));
+    setSelectedUserIds([]);
+  };
+
+  const handleOpenUserDetails = (user: User) => {
+    setEditingUserId(user.id);
+    setEditName(user.name);
+    setEditEmail(user.email);
+    setEditRole(user.role);
+    setEditStatus(user.status);
+    setIsDetailsOpen(true);
+  };
+
+  const handleSheetOpenChange = (open: boolean) => {
+    setIsDetailsOpen(open);
+    if (!open) {
+      setEditingUserId(null);
+    }
+  };
+
+  const handleSaveUserDetails = () => {
+    if (editingUserId == null) return;
+
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === editingUserId
+          ? {
+              ...user,
+              name: editName,
+              email: editEmail,
+              role: editRole,
+              status: editStatus,
+            }
+          : user,
+      ),
+    );
+    setIsDetailsOpen(false);
+  };
+
+  const handleDeleteCurrentUser = () => {
+    if (editingUserId == null) return;
+
+    setUsers((prev) => prev.filter((user) => user.id !== editingUserId));
+    setSelectedUserIds((prev) => prev.filter((id) => id !== editingUserId));
+    setIsDetailsOpen(false);
+  };
+
+  return (
+    <Sheet open={isDetailsOpen} onOpenChange={handleSheetOpenChange}>
+      <DashboardLayout
+        title={t("pages.users.title")}
+        subtitle={t("pages.users.subtitle")}
+      >
+        <div className="mx-auto max-w-6xl">
+          <UsersFilters
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            selectedRole={selectedRole}
+            onRoleChange={handleRoleChange}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            counts={counts}
+            availableRoles={availableRoles}
+          />
+
+          {selectedUserIds.length > 0 && (
+            <div className="mb-3 flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2 text-sm">
+              <span className="text-muted-foreground">
+                {selectedUserIds.length} {t("pages.users.bulk.selectedLabel")}
+              </span>
+              <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
+                {t("pages.users.bulk.delete")}
+              </Button>
+            </div>
+          )}
+
+          <UsersTable
+            users={paginatedUsers}
+            page={currentPage}
+            total={total}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+            onToggleStatus={handleToggleStatus}
+            selectedUserIds={selectedUserIds}
+            onToggleSelectUser={handleToggleSelectUser}
+            onToggleSelectAll={handleToggleSelectAll}
+            onUserClick={handleOpenUserDetails}
+          />
+        </div>
+      </DashboardLayout>
+
+      {editingUserId != null && (
+        <SheetContent side="right" className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>{t("pages.users.details.title")}</SheetTitle>
+            <SheetDescription>{t("pages.users.details.description")}</SheetDescription>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="user-name">{t("pages.users.details.name")}</Label>
+              <Input
+                id="user-name"
+                value={editName}
+                onChange={(event) => setEditName(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="user-email">{t("pages.users.details.email")}</Label>
+              <Input
+                id="user-email"
+                type="email"
+                value={editEmail}
+                onChange={(event) => setEditEmail(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="user-role">{t("pages.users.details.role")}</Label>
+              <Input
+                id="user-role"
+                value={editRole}
+                onChange={(event) => setEditRole(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>{t("pages.users.details.status")}</Label>
+              <Select
+                value={editStatus}
+                onValueChange={(value) => setEditStatus(value as UserStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">
+                    {t("pages.users.status.active")}
+                  </SelectItem>
+                  <SelectItem value="inactive">
+                    {t("pages.users.status.inactive")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>
+              {t("pages.users.details.actions.cancel")}
+            </Button>
+            <Button onClick={handleSaveUserDetails}>
+              {t("pages.users.details.actions.save")}
+            </Button>
+          </SheetFooter>
+
+          <div className="mt-6 border-t border-border pt-4">
+            <p className="mb-2 text-sm font-medium text-destructive">
+              {t("pages.users.details.dangerTitle")}
+            </p>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={handleDeleteCurrentUser}
+            >
+              {t("pages.users.details.actions.delete")}
+            </Button>
+          </div>
+        </SheetContent>
+      )}
+    </Sheet>
   );
 };
 

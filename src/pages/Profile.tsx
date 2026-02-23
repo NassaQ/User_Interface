@@ -237,7 +237,7 @@ const Profile = () => {
 
               <div>
                 <label className="text-sm text-muted-foreground block mb-2">
-                  Username
+                {t("pages.profile.fields.username")}
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -301,7 +301,7 @@ const Profile = () => {
 
               <div>
                 <label className="text-sm text-muted-foreground block mb-2">
-                  Status
+                {t("pages.profile.fields.status")}
                 </label>
                 <div className="relative">
                   <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

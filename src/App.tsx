@@ -21,7 +21,7 @@ import Billing from "./pages/Billing";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Users from "./pages/Users";
+import Users from "@/pages/Users";
 
 const queryClient = new QueryClient();
 

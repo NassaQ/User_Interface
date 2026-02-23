@@ -12,7 +12,7 @@ type Language = "en" | "ar";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 // ================================
@@ -343,7 +343,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [language]);
 
-  const t = (key: string): string => {
+  const t = (key: string, _params?: Record<string, string | number>): string => {
     return translations[language][key as keyof typeof translations.en] || key;
   };
 
