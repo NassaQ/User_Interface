@@ -12,7 +12,7 @@ type Language = "en" | "ar";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 // ================================
@@ -27,6 +27,7 @@ const componentTranslations = {
     "dashboard.layout.nav.dashboard": "Dashboard",
     "dashboard.layout.nav.studio": "AI Studio",
     "dashboard.layout.nav.history": "History",
+    "dashboard.layout.nav.users": "Users",
     "dashboard.layout.nav.profile": "Profile",
     "dashboard.layout.nav.settings": "Settings",
     "dashboard.layout.nav.billing": "Billing",
@@ -175,6 +176,7 @@ const componentTranslations = {
     "dashboard.layout.nav.dashboard": "لوحة التحكم",
     "dashboard.layout.nav.studio": "استوديو الذكاء الاصطناعي",
     "dashboard.layout.nav.history": "السجل",
+    "dashboard.layout.nav.users": "المستخدمون",
     "dashboard.layout.nav.profile": "الملف الشخصي",
     "dashboard.layout.nav.settings": "الإعدادات",
     "dashboard.layout.nav.billing": "الفواتير",
@@ -187,7 +189,7 @@ const componentTranslations = {
     "cta.section.badge": "ابدأ تجربتك المجانية",
     "cta.section.title": "جاهز لتحويل طريقة عملك؟",
     "cta.section.description":
-      "انضم إلى آلاف الفرق التي تستخدم AI Flow لأتمتة سير العمل وزيادة الإنتاجية.",
+      "انضم إلى آلاف الفرق التي تستخدم نسّـق لأتمتة سير العمل وزيادة الإنتاجية.",
     "cta.section.actions.primary": "ابدأ مجانًا",
     "cta.section.actions.secondary": "تواصل مع المبيعات",
     "cta.section.note":
@@ -260,7 +262,7 @@ const componentTranslations = {
     "hero.section.badge": "منصة مدعومة بالذكاء الاصطناعي",
     "hero.title": "حوّل سير عملك مع الذكاء الاصطناعي",
     "hero.subtitle":
-      "حلول قوية مدععومة بالذكاء الاصطناعي لتبسيط عمليات عملك وتعزيز الإنتاجية",
+      "حلول قوية مدعومة بالذكاء الاصطناعي لتبسيط عمليات عملك وتعزيز الإنتاجية",
     "hero.cta.primary": "ابدأ مجانًا",
     "hero.cta.secondary": "شاهد العرض",
 
@@ -341,7 +343,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [language]);
 
-  const t = (key: string): string => {
+  const t = (key: string, _params?: Record<string, string | number>): string => {
     return translations[language][key as keyof typeof translations.en] || key;
   };
 

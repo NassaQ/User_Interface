@@ -28,24 +28,9 @@ const About = () => {
       image: nada,
     },
     {
-      nameKey: "pages.about.team.names.osama",
-      roleKey: "pages.about.team.roles.backend",
-      image: osama,
-    },
-    {
       nameKey: "pages.about.team.names.ganna",
       roleKey: "pages.about.team.roles.data",
       image: ganna,
-    },
-    {
-      nameKey: "pages.about.team.names.ahmed",
-      roleKey: "pages.about.team.roles.data",
-      image: waly,
-    },
-    {
-      nameKey: "pages.about.team.names.youssef",
-      roleKey: "pages.about.team.roles.ai",
-      image: "https://i.pravatar.cc/150?img=4",
     },
     {
       nameKey: "pages.about.team.names.alaa",
@@ -53,14 +38,29 @@ const About = () => {
       image: alaa,
     },
     {
-      nameKey: "pages.about.team.names.elsayed",
-      roleKey: "pages.about.team.roles.data",
-      image: sayed,
-    },
-    {
       nameKey: "pages.about.team.names.yousef2",
       roleKey: "pages.about.team.roles.ai",
       image: youssif,
+    },
+    {
+      nameKey: "pages.about.team.names.youssef",
+      roleKey: "pages.about.team.roles.ai",
+      image: "https://i.pravatar.cc/150?img=4",
+    },
+    {
+      nameKey: "pages.about.team.names.osama",
+      roleKey: "pages.about.team.roles.backend",
+      image: osama,
+    },
+    {
+      nameKey: "pages.about.team.names.ahmed",
+      roleKey: "pages.about.team.roles.data",
+      image: waly,
+    },
+    {
+      nameKey: "pages.about.team.names.elsayed",
+      roleKey: "pages.about.team.roles.data",
+      image: sayed,
     },
     {
       nameKey: "pages.about.team.names.abdulrahman",
@@ -68,7 +68,6 @@ const About = () => {
       image: abdulrahman,
     },
   ];
-
 
   const values = [
     {
@@ -156,8 +155,6 @@ const About = () => {
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground">
               <p>{t("pages.about.story.p1")}</p>
-              <p>{t("pages.about.story.p2")}</p>
-              <p>{t("pages.about.story.p3")}</p>
             </div>
           </motion.div>
 

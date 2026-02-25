@@ -21,6 +21,7 @@ import Billing from "./pages/Billing";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Users from "@/pages/Users";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
               <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+              <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
