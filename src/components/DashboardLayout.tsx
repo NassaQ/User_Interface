@@ -36,6 +36,8 @@ interface DashboardLayoutProps {
 // 🌍 TRANSLATION: DashboardLayout
 // Namespace: dashboard.layout.nav.*
 // ================================
+const ADMIN_ROLE_ID = 99;
+
 const navItems = [
   {
     icon: LayoutDashboard,
@@ -44,7 +46,7 @@ const navItems = [
   },
   { icon: Sparkles, labelKey: "dashboard.layout.nav.studio", path: "/studio" },
   { icon: History, labelKey: "dashboard.layout.nav.history", path: "/history" },
-  { icon: Users, labelKey: "dashboard.layout.nav.users", path: "/users" },
+  { icon: Users, labelKey: "dashboard.layout.nav.users", path: "/users", adminOnly: true },
   { icon: User, labelKey: "dashboard.layout.nav.profile", path: "/profile" },
   {
     icon: Settings,
@@ -67,7 +69,7 @@ const DashboardLayout = ({
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
-  const { getAccessToken, logout } = useAuth();
+  const { getAccessToken, logout, userRole } = useAuth();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -123,7 +125,9 @@ const DashboardLayout = ({
           </Link>
 
           <nav className="space-y-1">
-            {navItems.map((item) => {
+            {navItems
+              .filter((item) => !item.adminOnly || userRole === ADMIN_ROLE_ID)
+              .map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <Link

@@ -17,7 +17,7 @@ import {
 import { ApiRequestError } from "@/lib/api";
 
 /* ------------------------------------------------------------------ */
-/*  Token helpers – tokens live ONLY in memory (not localStorage)      */
+/*  Token helpers – tokens persist in localStorage across sessions      */
 /* ------------------------------------------------------------------ */
 
 interface Tokens {
@@ -53,6 +53,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   /** Current access token (for attaching to API requests) */
   accessToken: string | null;
+  /** Role ID extracted from the JWT (e.g. 99 = admin) */
+  userRole: number | null;
   /** Login with email + password */
   login: (credentials: LoginCredentials) => Promise<void>;
   /** Clear tokens and redirect to /login */
@@ -71,7 +73,7 @@ const STORAGE_KEY = "__nassaq_tokens";
 
 function loadTokens(): Tokens | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (parsed?.accessToken && parsed?.refreshToken) return parsed as Tokens;
@@ -81,9 +83,9 @@ function loadTokens(): Tokens | null {
 
 function saveTokens(t: Tokens | null) {
   if (t) {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(t));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(t));
   } else {
-    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
 
@@ -203,17 +205,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [tokens?.refreshToken, logout]);
 
+  /* ---- derive role from access token ---- */
+  const userRole = useMemo<number | null>(() => {
+    if (!tokens?.accessToken) return null;
+    const payload = decodePayload(tokens.accessToken);
+    if (!payload || typeof payload.rid !== "number") return null;
+    return payload.rid;
+  }, [tokens?.accessToken]);
+
   /* ---- context value ---- */
   const value = useMemo<AuthContextValue>(
     () => ({
       isLoading,
       isAuthenticated: !!tokens?.accessToken,
       accessToken: tokens?.accessToken ?? null,
+      userRole,
       login,
       logout,
       getAccessToken,
     }),
-    [isLoading, tokens, login, logout, getAccessToken],
+    [isLoading, tokens, userRole, login, logout, getAccessToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

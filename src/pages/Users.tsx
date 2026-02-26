@@ -3,7 +3,7 @@
 // Namespace: pages.users.*
 // ================================
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -36,9 +36,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/context/LanguageContext";
-import { Mail, Search, Users as UsersIcon } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Mail, Search, Users as UsersIcon, Loader2 } from "lucide-react";
+import {
+  listUsers as listUsersApi,
+  updateUser as updateUserApi,
+  deleteUser as deleteUserApi,
+  type User as ApiUser,
+} from "@/services/users.service";
+import { useToast } from "@/hooks/use-toast";
 
 type UserStatus = "active" | "inactive";
 
@@ -46,6 +64,7 @@ export type User = {
   id: number;
   name: string;
   email: string;
+  username: string;
   role: string;
   status: UserStatus;
 };
@@ -54,78 +73,17 @@ type TabKey = "all" | "active" | "inactive";
 
 const PAGE_SIZE = 8;
 
-const initialUsers: User[] = [
-  {
-    id: 1,
-    name: "Mr. Laverne Cole",
-    email: "Stephany83@yahoo.com",
-    role: "Creative",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Irvin Gusikowski",
-    email: "Salvador98@yahoo.com",
-    role: "Markets",
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "Ignacio Jerde PhD",
-    email: "Baron_Dickinson@yahoo.com",
-    role: "Intranet",
-    status: "inactive",
-  },
-  {
-    id: 4,
-    name: "Lucio Walter",
-    email: "Roberto.Zieme@gmail.com",
-    role: "Optimization",
-    status: "active",
-  },
-  {
-    id: 5,
-    name: "Dr. Donnie Bernier",
-    email: "Mary81@hotmail.com",
-    role: "Response",
-    status: "active",
-  },
-  {
-    id: 6,
-    name: "Mark Robel II",
-    email: "Gregoria53@yahoo.com",
-    role: "Integration",
-    status: "active",
-  },
-  {
-    id: 7,
-    name: "Jean McDermott",
-    email: "Forest77@gmail.com",
-    role: "Solutions",
-    status: "inactive",
-  },
-  {
-    id: 8,
-    name: "Cindy Buckeridge",
-    email: "Era.Bruen@hotmail.com",
-    role: "Accounts",
-    status: "active",
-  },
-  {
-    id: 9,
-    name: "Samantha Page",
-    email: "Jeromy.Braun97@hotmail.com",
-    role: "Identity",
-    status: "active",
-  },
-  {
-    id: 10,
-    name: "Melaine Ernard",
-    email: "Frederic77@gmail.com",
-    role: "Mobility",
-    status: "active",
-  },
-];
+/** Map a backend user object to the local UI shape */
+function toUiUser(apiUser: ApiUser): User {
+  return {
+    id: apiUser.user_id,
+    name: apiUser.full_name,
+    email: apiUser.email,
+    username: apiUser.username,
+    role: apiUser.role ?? "—",
+    status: apiUser.is_active ? "active" : "inactive",
+  };
+}
 
 interface UsersFiltersProps {
   searchTerm: string;
@@ -249,7 +207,7 @@ const UsersFilters = ({
         <div className="text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-2">
             <UsersIcon className="h-4 w-4" />
-            {t("pages.users.summary.total")} {counts.all}
+            {t("pages.users.summary.total", { count: String(counts.all) })}
           </span>
         </div>
       </div>
@@ -306,6 +264,7 @@ const UsersTable = ({
                 {t("pages.users.table.no")}
               </TableHead>
               <TableHead>{t("pages.users.table.user")}</TableHead>
+              <TableHead>{t("pages.users.table.username")}</TableHead>
               <TableHead>{t("pages.users.table.email")}</TableHead>
               <TableHead>{t("pages.users.table.role")}</TableHead>
               <TableHead className="text-center">
@@ -357,11 +316,11 @@ const UsersTable = ({
                         <span className="font-medium text-foreground">
                           {user.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          {user.role}
-                        </span>
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    @{user.username}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {user.email}
@@ -441,6 +400,9 @@ const UsersTable = ({
                   <div>
                     <p className="font-medium text-foreground">{user.name}</p>
                     <p className="text-xs text-muted-foreground">
+                      @{user.username}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
                       {user.email}
                     </p>
                   </div>
@@ -483,8 +445,8 @@ const UsersTable = ({
       </div>
 
       <div className="flex flex-col items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 text-sm text-muted-foreground sm:flex-row">
-        <span>
-          {t("pages.users.pagination.summary")} {startIndex}–{endIndex} / {total}
+        <span className="whitespace-nowrap">
+          {t("pages.users.pagination.summary", { start: String(startIndex), end: String(endIndex), total: String(total) })}
         </span>
 
         <Pagination>
@@ -533,8 +495,11 @@ const UsersTable = ({
 
 const Users = () => {
   const { t } = useLanguage();
+  const { getAccessToken } = useAuth();
+  const { toast } = useToast();
 
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<TabKey>("all");
@@ -543,9 +508,34 @@ const Users = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
+  const [editUsername, setEditUsername] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editRole, setEditRole] = useState("");
   const [editStatus, setEditStatus] = useState<UserStatus>("active");
+  const [confirmDeleteType, setConfirmDeleteType] = useState<"single" | "bulk" | null>(null);
+
+  /* ---- Fetch users from backend ---- */
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = await getAccessToken();
+      if (!token) return;
+      const data = await listUsersApi(token, 0, 100);
+      setUsers(data.map(toUiUser));
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to load users",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [getAccessToken, toast]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const filteredUsers = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -591,17 +581,23 @@ const Users = () => {
     [users],
   );
 
-  const handleToggleStatus = (id: number, status: UserStatus) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id
-          ? {
-              ...user,
-              status,
-            }
-          : user,
-      ),
-    );
+  const handleToggleStatus = async (id: number, status: UserStatus) => {
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+      await updateUserApi(token, id, { is_active: status === "active" });
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === id ? { ...user, status } : user,
+        ),
+      );
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to update status",
+      });
+    }
   };
 
   const handleTabChange = (tab: TabKey) => {
@@ -633,15 +629,38 @@ const Users = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedUserIds.length === 0) return;
-    setUsers((prev) => prev.filter((user) => !selectedUserIds.includes(user.id)));
-    setSelectedUserIds([]);
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+      await Promise.all(selectedUserIds.map((id) => deleteUserApi(token, id)));
+      setUsers((prev) => prev.filter((user) => !selectedUserIds.includes(user.id)));
+      setSelectedUserIds([]);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to delete users",
+      });
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (confirmDeleteType === "bulk") {
+      await handleDeleteSelected();
+    } else if (confirmDeleteType === "single") {
+      await handleDeleteCurrentUser();
+    }
+    setConfirmDeleteType(null);
+    setIsDetailsOpen(false);
+    setEditingUserId(null);
   };
 
   const handleOpenUserDetails = (user: User) => {
     setEditingUserId(user.id);
     setEditName(user.name);
+    setEditUsername(user.username);
     setEditEmail(user.email);
     setEditRole(user.role);
     setEditStatus(user.status);
@@ -655,34 +674,60 @@ const Users = () => {
     }
   };
 
-  const handleSaveUserDetails = () => {
+  const handleSaveUserDetails = async () => {
     if (editingUserId == null) return;
-
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === editingUserId
-          ? {
-              ...user,
-              name: editName,
-              email: editEmail,
-              role: editRole,
-              status: editStatus,
-            }
-          : user,
-      ),
-    );
-    setIsDetailsOpen(false);
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+      await updateUserApi(token, editingUserId, {
+        username: editUsername,
+        email: editEmail,
+        is_active: editStatus === "active",
+      });
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === editingUserId
+            ? {
+                ...user,
+                name: editName,
+                username: editUsername,
+                email: editEmail,
+                role: editRole,
+                status: editStatus,
+              }
+            : user,
+        ),
+      );
+      setIsDetailsOpen(false);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to save user",
+      });
+    }
   };
 
-  const handleDeleteCurrentUser = () => {
+  const handleDeleteCurrentUser = async () => {
     if (editingUserId == null) return;
-
-    setUsers((prev) => prev.filter((user) => user.id !== editingUserId));
-    setSelectedUserIds((prev) => prev.filter((id) => id !== editingUserId));
-    setIsDetailsOpen(false);
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+      await deleteUserApi(token, editingUserId);
+      setUsers((prev) => prev.filter((user) => user.id !== editingUserId));
+      setSelectedUserIds((prev) => prev.filter((id) => id !== editingUserId));
+      setIsDetailsOpen(false);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to delete user",
+      });
+    }
   };
 
   return (
+    <>
     <Sheet open={isDetailsOpen} onOpenChange={handleSheetOpenChange}>
       <DashboardLayout
         title={t("pages.users.title")}
@@ -700,12 +745,18 @@ const Users = () => {
             availableRoles={availableRoles}
           />
 
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+          <>
           {selectedUserIds.length > 0 && (
             <div className="mb-3 flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2 text-sm">
               <span className="text-muted-foreground">
                 {selectedUserIds.length} {t("pages.users.bulk.selectedLabel")}
               </span>
-              <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
+              <Button variant="destructive" size="sm" onClick={() => setConfirmDeleteType("bulk")}>
                 {t("pages.users.bulk.delete")}
               </Button>
             </div>
@@ -723,6 +774,8 @@ const Users = () => {
             onToggleSelectAll={handleToggleSelectAll}
             onUserClick={handleOpenUserDetails}
           />
+          </>
+          )}
         </div>
       </DashboardLayout>
 
@@ -739,7 +792,17 @@ const Users = () => {
               <Input
                 id="user-name"
                 value={editName}
-                onChange={(event) => setEditName(event.target.value)}
+                disabled
+                className="opacity-70 cursor-not-allowed"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="user-username">{t("pages.users.details.username")}</Label>
+              <Input
+                id="user-username"
+                value={editUsername}
+                onChange={(event) => setEditUsername(event.target.value)}
               />
             </div>
 
@@ -799,7 +862,7 @@ const Users = () => {
             <Button
               variant="destructive"
               className="w-full"
-              onClick={handleDeleteCurrentUser}
+              onClick={() => setConfirmDeleteType("single")}
             >
               {t("pages.users.details.actions.delete")}
             </Button>
@@ -807,6 +870,26 @@ const Users = () => {
         </SheetContent>
       )}
     </Sheet>
+
+    <AlertDialog open={confirmDeleteType !== null} onOpenChange={(open) => { if (!open) { setConfirmDeleteType(null); } }}>
+      <AlertDialogContent className="z-[200]">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("pages.users.confirm.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {confirmDeleteType === "bulk"
+              ? t("pages.users.confirm.bulkDescription", { count: String(selectedUserIds.length) })
+              : t("pages.users.confirm.singleDescription")}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t("pages.users.confirm.no")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            {t("pages.users.confirm.yes")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 
