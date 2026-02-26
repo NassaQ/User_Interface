@@ -343,8 +343,14 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [language]);
 
-  const t = (key: string, _params?: Record<string, string | number>): string => {
-    return translations[language][key as keyof typeof translations.en] || key;
+  const t = (key: string, params?: Record<string, string | number>): string => {
+    let value: string = translations[language][key as keyof typeof translations.en] || key;
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        value = value.replaceAll(`{${k}}`, String(v));
+      }
+    }
+    return value;
   };
 
   return (
