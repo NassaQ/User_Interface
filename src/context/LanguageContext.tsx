@@ -24,6 +24,7 @@ const componentTranslations = {
     // DashboardLayout
     // ================================
     "dashboard.layout.brand": "Nassaq",
+    "dashboard.layout.section.admin": "Admin area",
     "dashboard.layout.nav.dashboard": "Dashboard",
     "dashboard.layout.nav.studio": "AI Studio",
     "dashboard.layout.nav.history": "History",
@@ -173,6 +174,7 @@ const componentTranslations = {
     // DashboardLayout
     // ================================
     "dashboard.layout.brand": "نسّـق",
+    "dashboard.layout.section.admin": "منطقة الإدارة",
     "dashboard.layout.nav.dashboard": "لوحة التحكم",
     "dashboard.layout.nav.studio": "استوديو الذكاء الاصطناعي",
     "dashboard.layout.nav.history": "السجل",
@@ -347,7 +349,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     let value: string = translations[language][key as keyof typeof translations.en] || key;
     if (params) {
       for (const [k, v] of Object.entries(params)) {
-        value = value.replaceAll(`{${k}}`, String(v));
+        value = value.split(`{${k}}`).join(String(v));
       }
     }
     return value;

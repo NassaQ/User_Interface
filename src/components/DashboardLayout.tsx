@@ -10,7 +10,7 @@ import {
   LayoutDashboard,
   Sparkles,
   History,
-  User,
+  User as UserIcon,
   Users,
   Settings,
   HelpCircle,
@@ -38,7 +38,7 @@ interface DashboardLayoutProps {
 // ================================
 const ADMIN_ROLE_ID = 99;
 
-const navItems = [
+const mainNavItems = [
   {
     icon: LayoutDashboard,
     labelKey: "dashboard.layout.nav.dashboard",
@@ -46,8 +46,7 @@ const navItems = [
   },
   { icon: Sparkles, labelKey: "dashboard.layout.nav.studio", path: "/studio" },
   { icon: History, labelKey: "dashboard.layout.nav.history", path: "/history" },
-  { icon: Users, labelKey: "dashboard.layout.nav.users", path: "/users", adminOnly: true },
-  { icon: User, labelKey: "dashboard.layout.nav.profile", path: "/profile" },
+  { icon: UserIcon, labelKey: "dashboard.layout.nav.profile", path: "/profile" },
   {
     icon: Settings,
     labelKey: "dashboard.layout.nav.settings",
@@ -59,6 +58,15 @@ const navItems = [
     path: "/billing",
   },
   { icon: HelpCircle, labelKey: "dashboard.layout.nav.help", path: "/support" },
+];
+
+const adminNavItems = [
+  {
+    icon: Users,
+    labelKey: "dashboard.layout.nav.users",
+    path: "/users",
+    adminOnly: true,
+  },
 ];
 
 const DashboardLayout = ({
@@ -125,9 +133,7 @@ const DashboardLayout = ({
           </Link>
 
           <nav className="space-y-1">
-            {navItems
-              .filter((item) => !item.adminOnly || userRole === ADMIN_ROLE_ID)
-              .map((item) => {
+            {mainNavItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <Link
@@ -145,6 +151,33 @@ const DashboardLayout = ({
                 </Link>
               );
             })}
+
+            {userRole === ADMIN_ROLE_ID && (
+              <div className="mt-6 pt-4 border-t border-border/60 space-y-1">
+                <p className="px-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground/70">
+                  {t("dashboard.layout.section.admin")}
+                </p>
+
+                {adminNavItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.labelKey}
+                      to={item.path}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                        isActive
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      }`}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span className="font-medium">{t(item.labelKey)}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </nav>
 
           <div className="absolute bottom-6 left-6 right-6">
