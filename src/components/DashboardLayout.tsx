@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Sparkles,
   History,
+  Search,
   User,
   Users,
   Settings,
@@ -18,12 +19,14 @@ import {
   LogOut,
   Zap,
   Menu,
+  Loader2,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
+import { useProcessing } from "@/context/ProcessingContext";
 import { getCurrentUser, type User } from "@/services/users.service";
 
 interface DashboardLayoutProps {
@@ -46,6 +49,7 @@ const navItems = [
   },
   { icon: Sparkles, labelKey: "dashboard.layout.nav.studio", path: "/studio" },
   { icon: History, labelKey: "dashboard.layout.nav.history", path: "/history" },
+  { icon: Search, labelKey: "dashboard.layout.nav.search", path: "/search" },
   { icon: Users, labelKey: "dashboard.layout.nav.users", path: "/users", adminOnly: true },
   { icon: User, labelKey: "dashboard.layout.nav.profile", path: "/profile" },
   {
@@ -70,6 +74,7 @@ const DashboardLayout = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
   const { getAccessToken, logout, userRole } = useAuth();
+  const { isProcessing, selectedFile } = useProcessing();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -142,10 +147,30 @@ const DashboardLayout = ({
                 >
                   <item.icon className="w-5 h-5" />
                   <span className="font-medium">{t(item.labelKey)}</span>
+                  {item.path === "/studio" && isProcessing && (
+                    <span className="ml-auto w-2 h-2 bg-primary rounded-full animate-pulse" />
+                  )}
                 </Link>
               );
             })}
           </nav>
+
+          {/* Background processing indicator */}
+          {isProcessing && (
+            <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-xl">
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 text-primary animate-spin flex-shrink-0" />
+                <span className="text-xs font-medium text-primary">
+                  {t("dashboard.layout.processing.active")}
+                </span>
+              </div>
+              {selectedFile && (
+                <p className="text-[11px] text-muted-foreground mt-1 truncate">
+                  {selectedFile.name}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="absolute bottom-6 left-6 right-6">
             <Button

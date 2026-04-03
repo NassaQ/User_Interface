@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ProcessingProvider } from "@/context/ProcessingContext";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Pricing from "./pages/Pricing";
@@ -22,6 +23,7 @@ import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Users from "@/pages/Users";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,7 @@ const App = () => (
     <ThemeProvider>
       <LanguageProvider>
         <AuthProvider>
+        <ProcessingProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -44,6 +47,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/studio" element={<ProtectedRoute><Studio /></ProtectedRoute>} />
               <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+              <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
@@ -53,6 +57,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </ProcessingProvider>
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>

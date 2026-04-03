@@ -185,7 +185,7 @@ const About = () => {
                     <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-border group-hover:border-primary transition-all">
                       <img
                         src={member.image}
-                        alt={member.name}
+                        alt={t(member.nameKey)}
                         className="w-full h-full object-cover"
                       />
                     </div>
