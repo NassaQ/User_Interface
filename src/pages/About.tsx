@@ -17,6 +17,7 @@ import alaa from "../assets/alaa.jpg";
 import sayed from "../assets/sayed.jpg";
 import osama from "../assets/Osama.jpg";
 import abdulrahman from "../assets/abdulrahman.png";
+import yosifmohamed from "../assets/Yosifmohamed.jpeg"
 
 const About = () => {
   const { t } = useLanguage();
@@ -45,7 +46,7 @@ const About = () => {
     {
       nameKey: "pages.about.team.names.youssef",
       roleKey: "pages.about.team.roles.ai",
-      image: "https://i.pravatar.cc/150?img=4",
+      image: yosifmohamed,
     },
     {
       nameKey: "pages.about.team.names.osama",
