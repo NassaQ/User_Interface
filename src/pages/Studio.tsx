@@ -423,7 +423,6 @@ const Studio = () => {
           className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
@@ -565,6 +564,104 @@ const Studio = () => {
           </div>
         </motion.div>
       </div>
+      {/* FILE POPUP */}
+      <AnimatePresence>
+        {showFilePopup && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFilePopup(false)}
+            />
+
+            {/* Modal */}
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div
+                className="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-5">
+                  <button
+                    onClick={() => setShowFilePopup(false)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  <div className="text-center flex-1">
+                    <h3 className="font-semibold text-foreground text-sm">
+                      {t("pages.studio.popup.title")}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {t("pages.studio.popup.subtitle")}
+                    </p>
+                  </div>
+
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Upload className="w-4 h-4 text-primary" />
+                  </div>
+                </div>
+
+                {/* Drop Zone */}
+                <div
+                  className="border-2 border-dashed border-border hover:border-primary/40 rounded-xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-all hover:bg-secondary/50 mb-4"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                    <Upload className="w-5 h-5 text-muted-foreground" />
+                  </div>
+
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    {t("pages.studio.popup.drag")}
+                  </p>
+
+                  <p className="text-xs text-muted-foreground">
+                    PDF, DOC, TXT, CSV, XLSX — Max 25MB
+                  </p>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt,.csv,.xlsx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setAttachedFile(file.name);
+                        setShowFilePopup(false);
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Extensions Chips */}
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {[".xlsx", ".csv", ".txt", ".docx", ".doc", ".pdf"].map(
+                    (ext) => (
+                      <span
+                        key={ext}
+                        className="text-xs font-mono text-primary/70 bg-primary/5 px-3 py-1 rounded-full border border-primary/10"
+                      >
+                        {ext}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 };

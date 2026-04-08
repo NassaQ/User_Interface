@@ -20,6 +20,8 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Billing from "./pages/Billing";
 import Support from "./pages/Support";
+import UploadDocument from "./pages/UploadDocument.tsx";
+
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Users from "@/pages/Users";
