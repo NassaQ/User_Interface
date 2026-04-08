@@ -28,12 +28,16 @@ const componentTranslations = {
     "dashboard.layout.nav.dashboard": "Dashboard",
     "dashboard.layout.nav.studio": "AI Studio",
     "dashboard.layout.nav.history": "History",
+    "dashboard.layout.nav.search": "Search & Chat",
     "dashboard.layout.nav.users": "Users",
     "dashboard.layout.nav.profile": "Profile",
     "dashboard.layout.nav.settings": "Settings",
     "dashboard.layout.nav.billing": "Billing",
     "dashboard.layout.nav.help": "Help",
     "dashboard.layout.actions.signOut": "Sign Out",
+
+    // Processing indicator
+    "dashboard.layout.processing.active": "Processing in background...",
 
     // ================================
     // CTA
@@ -178,12 +182,16 @@ const componentTranslations = {
     "dashboard.layout.nav.dashboard": "لوحة التحكم",
     "dashboard.layout.nav.studio": "استوديو الذكاء الاصطناعي",
     "dashboard.layout.nav.history": "السجل",
+    "dashboard.layout.nav.search": "البحث والدردشة",
     "dashboard.layout.nav.users": "المستخدمون",
     "dashboard.layout.nav.profile": "الملف الشخصي",
     "dashboard.layout.nav.settings": "الإعدادات",
     "dashboard.layout.nav.billing": "الفواتير",
     "dashboard.layout.nav.help": "المساعدة",
     "dashboard.layout.actions.signOut": "تسجيل الخروج",
+
+    // Processing indicator
+    "dashboard.layout.processing.active": "جاري المعالجة في الخلفية...",
 
     // ================================
     // CTA
