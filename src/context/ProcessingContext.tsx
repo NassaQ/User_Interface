@@ -18,7 +18,6 @@ import {
   type DocumentProcessResponse,
 } from "@/services/documents.service";
 import { ragIngest } from "@/services/rag.service";
-import { uploadFile } from "@/services/files.service";
 
 /* ------------------------------------------------------------------ */
 /*  Shared constant                                                    */
@@ -43,9 +42,6 @@ interface ProcessingContextValue {
   ingested: boolean;
   ingestError: string | null;
   ingestChunks: number;
-  isUploadingFile: boolean;
-  fileUploaded: boolean;
-  fileUploadWarning: string | null;
 
   // ── Actions ───────────────────────────────────────────────────
   selectFile: (file: File) => void;
@@ -71,9 +67,6 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
   const [ingested, setIngested] = useState(false);
   const [ingestError, setIngestError] = useState<string | null>(null);
   const [ingestChunks, setIngestChunks] = useState(0);
-  const [isUploadingFile, setIsUploadingFile] = useState(false);
-  const [fileUploaded, setFileUploaded] = useState(false);
-  const [fileUploadWarning, setFileUploadWarning] = useState<string | null>(null);
 
   /* ---- selectFile ---- */
   const selectFile = useCallback((file: File) => {
@@ -92,9 +85,6 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     setIngested(false);
     setIngestError(null);
     setIngestChunks(0);
-    setIsUploadingFile(false);
-    setFileUploaded(false);
-    setFileUploadWarning(null);
   }, []);
 
   /* ---- processFile ---- */
@@ -124,11 +114,10 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     if (!result || !result.success || isIngesting || ingested) return;
     setIsIngesting(true);
     setIngestError(null);
-    setFileUploadWarning(null);
-    setFileUploaded(false);
 
-    // Hoist document_id so both RAG ingest and file upload share the same ID
-    const documentId = crypto.randomUUID();
+    // Use the document_id from the backend processing result
+    // (the file was already uploaded to blob storage in process.py)
+    const documentId = result.document_id;
 
     try {
       // Step 1: RAG ingest (primary — must succeed)
@@ -143,22 +132,8 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
       setIngested(true);
       setIngestChunks(resp.chunks_created);
 
-      // Step 2: File upload (secondary — warn on failure, don't rollback)
-      if (selectedFile) {
-        setIsUploadingFile(true);
-        try {
-          await uploadFile(documentId, selectedFile);
-          setFileUploaded(true);
-        } catch (uploadErr) {
-          const msg =
-            uploadErr instanceof Error
-              ? uploadErr.message
-              : "Original file upload failed";
-          setFileUploadWarning(msg);
-        } finally {
-          setIsUploadingFile(false);
-        }
-      }
+      // Step 2: File was already uploaded to blob storage during processing,
+      // no duplicate upload needed here.
     } catch (err) {
       setIngestError(
         err instanceof Error ? err.message : "Failed to save to knowledge base",
@@ -166,7 +141,7 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsIngesting(false);
     }
-  }, [result, selectedFile, isIngesting, ingested]);
+  }, [result, isIngesting, ingested]);
 
   /* ---- reset ---- */
   const reset = useCallback(() => {
@@ -176,9 +151,6 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     setIngested(false);
     setIngestError(null);
     setIngestChunks(0);
-    setIsUploadingFile(false);
-    setFileUploaded(false);
-    setFileUploadWarning(null);
   }, []);
 
   return (
@@ -192,9 +164,6 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
         ingested,
         ingestError,
         ingestChunks,
-        isUploadingFile,
-        fileUploaded,
-        fileUploadWarning,
         selectFile,
         processFile,
         ingestToKB,

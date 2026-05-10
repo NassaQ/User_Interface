@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -117,11 +116,8 @@ const History = () => {
       {!loading && (
         <>
           {/* ── Search & Filters ────────────────────────────────── */}
-          <motion.div
-            className="bg-card border border-border rounded-2xl p-4 sm:p-5 mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+          <div
+            className="bg-card border border-border rounded-2xl p-4 sm:p-5 mb-6 animate-fade-in-up animate-on-mount"
           >
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
@@ -172,15 +168,13 @@ const History = () => {
                 ))}
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* ── Desktop Table ──────────────────────────────────── */}
           {filteredItems.length > 0 && (
-            <motion.div
-              className="bg-card border border-border rounded-2xl overflow-hidden hidden sm:block"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+            <div
+              className="bg-card border border-border rounded-2xl overflow-hidden hidden sm:block animate-fade-in-up animate-on-mount"
+              style={{ animationDelay: '0.1s' }}
             >
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -215,12 +209,10 @@ const History = () => {
 
                   <tbody className="divide-y divide-border">
                     {filteredItems.map((item, index) => (
-                      <motion.tr
+                      <tr
                         key={item.id}
-                        className="hover:bg-secondary/30 transition-colors"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.2 + index * 0.03 }}
+                        className="hover:bg-secondary/30 transition-colors animate-fade-in-up animate-on-mount"
+                        style={{ animationDelay: `${0.2 + index * 0.03}s` }}
                       >
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -290,7 +282,7 @@ const History = () => {
                             </span>
                           </div>
                         </td>
-                      </motion.tr>
+                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -302,19 +294,17 @@ const History = () => {
                   .replace("{count}", filteredItems.length.toString())
                   .replace("{total}", items.length.toString())}
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* ── Mobile Cards ──────────────────────────────────── */}
           {filteredItems.length > 0 && (
             <div className="sm:hidden space-y-3">
               {filteredItems.map((item, index) => (
-                <motion.div
+                <div
                   key={item.id}
-                  className="bg-card border border-border rounded-2xl p-4"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                  className="bg-card border border-border rounded-2xl p-4 animate-fade-in-up animate-on-mount"
+                  style={{ animationDelay: `${0.1 + index * 0.05}s` }}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -348,18 +338,15 @@ const History = () => {
                       <span>${item.total_cost_usd.toFixed(4)}</span>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
 
           {/* ── Empty State ───────────────────────────────────── */}
           {filteredItems.length === 0 && (
-            <motion.div
-              className="bg-card border border-border rounded-2xl p-12 text-center"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
+            <div
+              className="bg-card border border-border rounded-2xl p-12 text-center animate-fade-in-scale animate-on-mount"
             >
               <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <FolderOpen className="w-8 h-8 text-muted-foreground" />
@@ -387,7 +374,7 @@ const History = () => {
                   {t("pages.history.empty.clear")}
                 </Button>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

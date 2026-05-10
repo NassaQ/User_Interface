@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -23,6 +22,8 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { useProcessing, SUPPORTED_EXTENSIONS } from "@/context/ProcessingContext";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Culture: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
@@ -36,6 +37,15 @@ const CATEGORY_COLORS: Record<string, string> = {
   Error: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
+/** Pre-process OCR text for better markdown rendering */
+function preprocessMarkdown(text: string): string {
+  return text
+    // Convert · (middle-dot) bullet to standard markdown - bullet
+    .replace(/^· /gm, "- ")
+    // Convert . (period) bullet to standard markdown - bullet
+    .replace(/^\. /gm, "- ");
+}
+
 const Studio = () => {
   const { t } = useLanguage();
   const {
@@ -47,9 +57,6 @@ const Studio = () => {
     ingested,
     ingestError,
     ingestChunks,
-    isUploadingFile,
-    fileUploaded,
-    fileUploadWarning,
     selectFile,
     processFile,
     ingestToKB,
@@ -60,6 +67,7 @@ const Studio = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showFilePopup, setShowFilePopup] = useState(false);
 
   // ── Drag & drop handlers ────────────────────────────────────
   const handleDrop = useCallback(
@@ -120,11 +128,8 @@ const Studio = () => {
     >
       <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-180px)]">
         {/* -- Left Panel: Upload -------------------------------- */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
+        <div
+          className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden animate-slide-in-left animate-on-mount"
         >
           {/* Header */}
           <div className="p-4 border-b border-border">
@@ -327,61 +332,29 @@ const Studio = () => {
             )}
 
             {/* Error state */}
-            {error && !isProcessing && (
-              <div className="mt-4 flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm text-red-700 dark:text-red-400">
-                    Processing failed
-                  </p>
-                  <p className="text-xs text-red-600 dark:text-red-500 mt-0.5">
-                    {error}
-                  </p>
-                </div>
+            {error && (
+              <div className="flex-1 flex flex-col items-center justify-center p-4">
+                <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+                <p className="font-medium text-foreground mb-1">
+                  Processing failed
+                </p>
+                <p className="text-sm text-destructive text-center mb-6 max-w-xs break-words">
+                  {error}
+                </p>
+                <Button variant="outline" onClick={handleReset}>
+                  Try another file
+                </Button>
               </div>
             )}
-          </div>
 
-          {/* Fixed footer: action buttons -- always visible */}
-          {result && result.success && (
-            <div className="flex-shrink-0 p-4 border-t border-border space-y-2">
-              {ingested ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                    <Database className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-sm text-blue-700 dark:text-blue-400">
-                        {t("pages.studio.ingest.success")}
-                      </p>
-                      <p className="text-xs text-blue-600 dark:text-blue-500">
-                        {t("pages.studio.ingest.chunksCreated").replace("{count}", String(ingestChunks))}
-                      </p>
-                    </div>
-                  </div>
-                  {/* File upload status */}
-                  {isUploadingFile && (
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <Loader2 className="w-4 h-4 text-blue-600 flex-shrink-0 animate-spin" />
-                      <p className="text-xs text-blue-600 dark:text-blue-500">
-                        {t("pages.studio.ingest.fileUploading")}
-                      </p>
-                    </div>
-                  )}
-                  {fileUploaded && !fileUploadWarning && (
-                    <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <p className="text-xs text-green-600 dark:text-green-500">
-                        {t("pages.studio.ingest.fileUploadSuccess")}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Button
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white"
-                  onClick={ingestToKB}
-                  disabled={isIngesting}
-                >
+            {result && result.success && (
+              <div className="p-4 border-t border-border mt-auto bg-secondary/30">
+                {!ingested ? (
+                  <Button
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 mb-3"
+                    onClick={ingestToKB}
+                    disabled={isIngesting}
+                  >
                   {isIngesting ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
@@ -391,19 +364,16 @@ const Studio = () => {
                     ? t("pages.studio.ingest.saving")
                     : t("pages.studio.ingest.button")}
                 </Button>
+              ) : (
+                <div className="flex items-center justify-center gap-2 p-2 mb-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg border border-green-200 dark:border-green-800">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Added to Knowledge Base</span>
+                </div>
               )}
               {ingestError && (
                 <div className="flex items-start gap-2 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                   <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-red-600 dark:text-red-500">{ingestError}</p>
-                </div>
-              )}
-              {fileUploadWarning && (
-                <div className="flex items-start gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-600 dark:text-amber-500">
-                    {t("pages.studio.ingest.fileUploadWarning")}
-                  </p>
                 </div>
               )}
               <Button
@@ -416,13 +386,12 @@ const Studio = () => {
               </Button>
             </div>
           )}
-        </motion.div>
+          </div>
+        </div>
 
         {/* -- Right Panel: Extracted Text ------------------------ */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
+        <div
+          className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden animate-slide-in-right animate-on-mount"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
@@ -491,8 +460,11 @@ const Studio = () => {
                   dir="auto"
                   style={{ unicodeBidi: "plaintext" }}
                 >
-                  <ReactMarkdown>
-                    {result.extracted_text || "(No text extracted)"}
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeRaw]}
+                    remarkPlugins={[remarkGfm]}
+                  >
+                    {preprocessMarkdown(result.extracted_text || "(No text extracted)")}
                   </ReactMarkdown>
                 </div>
 
@@ -562,29 +534,21 @@ const Studio = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
       {/* FILE POPUP */}
-      <AnimatePresence>
-        {showFilePopup && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowFilePopup(false)}
-            />
+      {showFilePopup && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-fade-in animate-on-mount"
+            onClick={() => setShowFilePopup(false)}
+          />
 
-            {/* Modal */}
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
+          {/* Modal */}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in-scale animate-on-mount"
+          >
               <div
                 className="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-6"
                 onClick={(e) => e.stopPropagation()}
@@ -658,10 +622,9 @@ const Studio = () => {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </DashboardLayout>
   );
 };

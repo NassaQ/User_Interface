@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,31 +12,100 @@ import {
   ArrowLeft,
   HardDrive,
   File,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { useProcessing, SUPPORTED_EXTENSIONS } from "@/context/ProcessingContext";
+import { toast } from "sonner";
 
 const UploadDocument = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
+  const {
+    selectedFile,
+    isProcessing,
+    result,
+    error,
+    selectFile,
+    processFile,
+    reset,
+  } = useProcessing();
+
+  // ── Form state ───────────────────────────────────────────────
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
 
-  const handleDragOver = (e: React.DragEvent) => {
+  // ── Navigate to Studio when processing completes ─────────────
+  useEffect(() => {
+    if (result && result.success) {
+      toast.success(t("pages.upload.messages.success"), {
+        description: result.filename,
+        icon: <CheckCircle2 className="w-4 h-4 text-green-500" />,
+      });
+      navigate("/studio");
+    }
+  }, [result, navigate, t]);
+
+  // ── Show error toasts ────────────────────────────────────────
+  useEffect(() => {
+    if (error) {
+      toast.error(t("pages.upload.messages.error"), {
+        description: error,
+        icon: <AlertCircle className="w-4 h-4 text-red-500" />,
+      });
+    }
+  }, [error, t]);
+
+  // ── Drag & drop handlers ─────────────────────────────────────
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-  };
+  }, []);
 
-  const handleDragLeave = () => {
+  const handleDragLeave = useCallback(() => {
     setIsDragging(false);
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) setFileName(file.name);
-  };
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        setFileName(file.name);
+        selectFile(file);
+      }
+    },
+    [selectFile],
+  );
+
+  // ── File input handler ───────────────────────────────────────
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setFileName(file.name);
+        selectFile(file);
+      }
+    },
+    [selectFile],
+  );
+
+  // ── Submit handler ───────────────────────────────────────────
+  const handleSubmit = useCallback(async () => {
+    if (!selectedFile) {
+      toast.error(t("pages.upload.messages.noFile"));
+      return;
+    }
+    await processFile();
+  }, [selectedFile, processFile, t]);
 
   return (
     <DashboardLayout
@@ -43,11 +113,7 @@ const UploadDocument = () => {
       subtitle={t("pages.upload.subtitle")}
     >
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
+        <div className="animate-fade-in-up animate-on-mount">
           {/* Back link */}
           <Link
             to="/studio"
@@ -75,6 +141,8 @@ const UploadDocument = () => {
                 <Input
                   placeholder={t("pages.upload.placeholders.title")}
                   className="rounded-xl"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
 
@@ -86,6 +154,8 @@ const UploadDocument = () => {
                 <Textarea
                   placeholder={t("pages.upload.placeholders.description")}
                   className="rounded-xl min-h-[80px] resize-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
 
@@ -97,6 +167,8 @@ const UploadDocument = () => {
                 <Input
                   placeholder={t("pages.upload.placeholders.category")}
                   className="rounded-xl"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
                 />
               </div>
 
@@ -145,29 +217,34 @@ const UploadDocument = () => {
                     type="file"
                     className="hidden"
                     accept=".pdf,.doc,.docx,.txt,.csv,.xlsx"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setFileName(file.name);
-                    }}
+                    onChange={handleFileChange}
                   />
                 </div>
               </div>
 
               {/* Upload Button */}
-              <Button className="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 text-base font-semibold gap-2">
-                <Upload className="w-5 h-5" />
-                {t("pages.upload.actions.upload")}
+              <Button
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 text-base font-semibold gap-2"
+                disabled={isProcessing}
+                onClick={handleSubmit}
+              >
+                {isProcessing ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Upload className="w-5 h-5" />
+                )}
+                {isProcessing
+                  ? t("pages.upload.actions.processing")
+                  : t("pages.upload.actions.upload")}
               </Button>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-4">
               {/* Supported Formats */}
-              <motion.div
-                className="bg-card border border-border rounded-2xl p-5"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.15 }}
+              <div
+                className="bg-card border border-border rounded-2xl p-5 animate-slide-in-right animate-on-mount"
+                style={{ animationDelay: '0.15s' }}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-primary" />
@@ -198,14 +275,12 @@ const UploadDocument = () => {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
               {/* Limits */}
-              <motion.div
-                className="bg-card border border-border rounded-2xl p-5"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.25 }}
+              <div
+                className="bg-card border border-border rounded-2xl p-5 animate-slide-in-right animate-on-mount"
+                style={{ animationDelay: '0.25s' }}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <HardDrive className="w-5 h-5 text-primary" />
@@ -240,14 +315,12 @@ const UploadDocument = () => {
                     </span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Security */}
-              <motion.div
-                className="bg-card border border-border rounded-2xl p-5"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.35 }}
+              <div
+                className="bg-card border border-border rounded-2xl p-5 animate-slide-in-right animate-on-mount"
+                style={{ animationDelay: '0.35s' }}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-5 h-5 text-green-500" />
@@ -259,10 +332,10 @@ const UploadDocument = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t("pages.upload.security.desc")}
                 </p>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );

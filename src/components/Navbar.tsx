@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { useLanguage } from "@/context/LanguageContext";
 import ThemeToggle from "./ThemeToggle";
 import LanguageToggle from "./LanguageToggle";
@@ -49,11 +49,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="animate-slide-in-left animate-on-mount">
             <Link
               to="/"
               className="flex items-center gap-2 text-xl lg:text-2xl font-bold"
@@ -70,16 +66,15 @@ const Navbar = () => {
                 {t("navbar.brand")}
               </span>
             </Link>
-          </motion.div>
+          </div>
 
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link, index) => (
-              <motion.div
+              <div
                 key={link.path}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="animate-slide-down animate-on-mount"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <Link
                   to={link.path}
@@ -91,18 +86,10 @@ const Navbar = () => {
                 >
                   {t(link.key)}
                   {isActive(link.path) && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent"
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30,
-                      }}
-                    />
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent" />
                   )}
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -151,51 +138,43 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            className="lg:hidden bg-card/95 backdrop-blur-xl border-t border-border"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`py-2 font-medium transition-colors ${
-                    isActive(link.path)
-                      ? "text-primary"
-                      : "text-foreground hover:text-primary"
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {t(link.key)}
-                </Link>
-              ))}
-
-              <div className="flex items-center gap-3 pt-4 border-t border-border">
-                <ThemeToggle />
-                <LanguageToggle />
-              </div>
-
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full">
-                  {t("navbar.actions.login")}
-                </Button>
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-card/95 backdrop-blur-xl border-t border-border animate-slide-down animate-on-mount">
+          <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`py-2 font-medium transition-colors ${
+                  isActive(link.path)
+                    ? "text-primary"
+                    : "text-foreground hover:text-primary"
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t(link.key)}
               </Link>
+            ))}
 
-              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full bg-gradient-to-r from-primary to-accent">
-                  {t("navbar.actions.register")}
-                </Button>
-              </Link>
+            <div className="flex items-center gap-3 pt-4 border-t border-border">
+              <ThemeToggle />
+              <LanguageToggle />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full">
+                {t("navbar.actions.login")}
+              </Button>
+            </Link>
+
+            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button className="w-full bg-gradient-to-r from-primary to-accent">
+                {t("navbar.actions.register")}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

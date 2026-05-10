@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -123,11 +123,9 @@ function SourceCard({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className="border border-border rounded-lg p-3 bg-card/50 hover:bg-card transition-colors"
+    <div
+      className="border border-border rounded-lg p-3 bg-card/50 hover:bg-card transition-colors animate-fade-in-up animate-on-mount"
+      style={{ animationDelay: `${index * 0.05}s` }}
     >
       {/* Header row */}
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -223,7 +221,7 @@ function SourceCard({
           )}
         </button>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -450,11 +448,9 @@ const Search = () => {
               ),
             },
           ].map((stat) => (
-            <motion.div
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-xl p-4 flex items-center gap-3"
+              className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 animate-fade-in-up animate-on-mount"
             >
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <stat.icon className="w-5 h-5 text-primary" />
@@ -463,7 +459,7 @@ const Search = () => {
                 <p className="text-2xl font-bold">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -619,15 +615,12 @@ const Search = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <AnimatePresence mode="popLayout">
+                    <>
                       {messages.map((msg) => (
-                        <motion.div
+                        <div
                           key={msg.id}
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
                           className={cn(
-                            "flex gap-3",
+                            "flex gap-3 animate-fade-in-up animate-on-mount",
                             msg.role === "user"
                               ? "justify-end"
                               : "justify-start",
@@ -668,17 +661,13 @@ const Search = () => {
                               <User className="w-4 h-4 text-primary-foreground" />
                             </div>
                           )}
-                        </motion.div>
+                        </div>
                       ))}
-                    </AnimatePresence>
+                    </>
 
                     {/* Typing indicator */}
                     {chatLoading && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex gap-3"
-                      >
+                      <div className="flex gap-3 animate-fade-in-up animate-on-mount">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                           <Bot className="w-4 h-4 text-primary" />
                         </div>
@@ -689,7 +678,7 @@ const Search = () => {
                             <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     )}
 
                     <div ref={chatEndRef} />
@@ -769,23 +758,15 @@ const Search = () => {
 
             {/* Search error */}
             {searchError && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm"
-              >
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm animate-fade-in animate-on-mount">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {searchError}
-              </motion.div>
+              </div>
             )}
 
             {/* Search results */}
             {searchResults && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-3"
-              >
+              <div className="space-y-3 animate-fade-in animate-on-mount">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
                     {t("pages.search.search.resultsCount").replace(
@@ -807,7 +788,7 @@ const Search = () => {
                     </p>
                   </div>
                 )}
-              </motion.div>
+              </div>
             )}
 
             {/* Empty state */}
@@ -849,11 +830,9 @@ const Search = () => {
             ) : (
               <div className="space-y-3">
                 {documents.map((doc) => (
-                  <motion.div
+                  <div
                     key={doc.document_id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="border border-border rounded-xl p-4 bg-card flex items-center justify-between gap-4"
+                    className="border border-border rounded-xl p-4 bg-card flex items-center justify-between gap-4 animate-fade-in-up animate-on-mount"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -918,7 +897,7 @@ const Search = () => {
                         )}
                       </Button>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             )}
@@ -971,9 +950,9 @@ function SourcesAccordion({
           <ChevronDown className="w-3 h-3 ml-auto" />
         )}
       </button>
-      <AnimatePresence>
+      
         {open && (
-          <motion.div
+          <div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -984,9 +963,9 @@ function SourcesAccordion({
                 <SourceCard key={idx} source={src} index={idx} t={t} />
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </div>
   );
 }

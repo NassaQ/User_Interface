@@ -4,7 +4,6 @@
 // ================================
 
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -20,6 +19,7 @@ import {
   Zap,
   Menu,
   Loader2,
+  FolderOpen,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -28,6 +28,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { useProcessing } from "@/context/ProcessingContext";
 import { getCurrentUser, type User } from "@/services/users.service";
+import GlobalSearch from "@/components/GlobalSearch";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -47,6 +48,7 @@ const mainNavItems = [
     labelKey: "dashboard.layout.nav.dashboard",
     path: "/dashboard",
   },
+  { icon: FolderOpen, labelKey: "dashboard.layout.nav.myFiles", path: "/files" },
   { icon: Sparkles, labelKey: "dashboard.layout.nav.studio", path: "/studio" },
   { icon: History, labelKey: "dashboard.layout.nav.history", path: "/history" },
   { icon: Search, labelKey: "dashboard.layout.nav.search", path: "/search" },
@@ -224,28 +226,31 @@ const DashboardLayout = ({
         {/* Top Bar */}
         <header className="bg-card border-b border-border px-4 sm:px-6 py-4 sticky top-0 z-30">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 min-w-0">
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden flex-shrink-0"
                 onClick={() => setSidebarOpen(true)}
               >
                 <Menu className="w-5 h-5" />
               </Button>
 
               {/* title و subtitle جايين مترجمين من الصفحات */}
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold">{title}</h1>
+              <div className="hidden sm:block min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold truncate">{title}</h1>
                 {subtitle && (
-                  <p className="text-sm text-muted-foreground hidden sm:block">
+                  <p className="text-sm text-muted-foreground truncate">
                     {subtitle}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            {/* 🌍 Global Semantic Search */}
+            <GlobalSearch />
+
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <ThemeToggle />
               <LanguageToggle />
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold text-sm">
@@ -256,14 +261,9 @@ const DashboardLayout = ({
         </header>
 
         {/* Page Content */}
-        <motion.main
-          className="flex-1 p-4 sm:p-6 overflow-auto"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
+        <main className="flex-1 p-4 sm:p-6 overflow-auto animate-fade-in animate-on-mount">
           {children}
-        </motion.main>
+        </main>
       </div>
     </div>
   );

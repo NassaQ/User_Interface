@@ -4,7 +4,6 @@
 // ================================
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -126,11 +125,8 @@ const UsersFilters = ({
   const { t } = useLanguage();
 
   return (
-    <motion.div
-      className="bg-card border border-border rounded-2xl p-4 sm:p-5 mb-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+    <div
+      className="bg-card border border-border rounded-2xl p-4 sm:p-5 mb-6 animate-fade-in-up animate-on-mount"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
@@ -211,7 +207,7 @@ const UsersFilters = ({
           </span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -241,11 +237,8 @@ const UsersTable = ({
   const allSelectedOnPage = users.length > 0 && users.every((user) => selectedUserIds.includes(user.id));
 
   return (
-    <motion.div
-      className="bg-card border border-border rounded-2xl overflow-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
+    <div
+      className="bg-card border border-border rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount delay-100"
     >
       <div className="hidden w-full sm:block">
         <Table>
@@ -489,7 +482,7 @@ const UsersTable = ({
           </PaginationContent>
         </Pagination>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

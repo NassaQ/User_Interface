@@ -4,7 +4,6 @@
 // ================================
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -91,11 +90,8 @@ const Support = () => {
     >
       <div className="max-w-4xl mx-auto">
         {/* Search */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl p-6 mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+        <div
+          className="bg-card border border-border rounded-2xl p-6 mb-6 animate-fade-in-up animate-on-mount"
         >
           <h2 className="text-xl font-semibold mb-4">
             {t("pages.support.search.title")}
@@ -110,14 +106,11 @@ const Support = () => {
               className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Quick Resources */}
-        <motion.div
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+        <div
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-fade-in-up animate-on-mount delay-100"
         >
           {resources.map((resource, index) => (
             <a
@@ -136,14 +129,11 @@ const Support = () => {
               </p>
             </a>
           ))}
-        </motion.div>
+        </div>
 
         {/* FAQ Section */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl overflow-hidden mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+        <div
+          className="bg-card border border-border rounded-2xl overflow-hidden mb-6 animate-fade-in-up animate-on-mount delay-200"
         >
           <div className="flex items-center gap-3 p-5 border-b border-border bg-secondary/30">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -171,21 +161,15 @@ const Support = () => {
                       }`}
                     />
                   </button>
-                  <AnimatePresence>
-                    {openFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
+                  {openFaq === index && (
+                      <div
+                        className="overflow-hidden animate-fade-in-up animate-on-mount"
                       >
                         <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
                           {t(faq.aKey)}
                         </div>
-                      </motion.div>
+                      </div>
                     )}
-                  </AnimatePresence>
                 </div>
               ))
             ) : (
@@ -196,14 +180,11 @@ const Support = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Contact Support */}
-        <motion.div
-          className="bg-gradient-to-r from-primary via-accent to-primary p-[1px] rounded-2xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+        <div
+          className="bg-gradient-to-r from-primary via-accent to-primary p-[1px] rounded-2xl animate-fade-in-up animate-on-mount delay-300"
         >
           <div className="bg-card rounded-2xl p-6 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -226,7 +207,7 @@ const Support = () => {
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );

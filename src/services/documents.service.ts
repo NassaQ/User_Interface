@@ -53,6 +53,7 @@ export interface DocumentProcessResponse {
   success: boolean;
   error: string | null;
   filename: string;
+  document_id: string;
   extracted_text: string;
   cleaned_text: string;
   primary_language: string;
@@ -65,11 +66,13 @@ export interface DocumentProcessResponse {
   quality: Record<string, unknown>;
   per_page: PageDiagnostic[];
   classification: ClassificationInfo | null;
-  costs: CostBreakdown;
+  costs: CostBreakdown | null;
 }
 
 export interface HistoryItem {
   id: string;
+  doc_id: number;
+  document_id: string;
   filename: string;
   category: string;
   confidence: number;
@@ -159,6 +162,91 @@ export async function fetchHistory(
 /**
  * Fetch dashboard statistics for the current user.
  */
+/* ------------------------------------------------------------------ */
+/*  Move Document                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface MoveDocumentRequest {
+  new_category: string;
+}
+
+export interface MoveDocumentResponse {
+  doc_id: number;
+  filename: string;
+  old_path: string;
+  new_path: string;
+  new_category: string;
+  message: string;
+}
+
+export interface DeleteDocumentResponse {
+  doc_id: number;
+  message: string;
+}
+
+/**
+ * Move a document to a different classification folder.
+ * This moves the blob, updates Cosmos DB, and updates SQL Ocr_Results.
+ */
+export async function moveDocument(
+  docId: number,
+  newCategory: string,
+): Promise<MoveDocumentResponse> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/v1/docs/${docId}/move`,
+    {
+      method: "PATCH",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ new_category: newCategory }),
+    },
+  );
+
+  if (!res.ok) {
+    let detail = "Failed to move document";
+    try {
+      const body = await res.json();
+      detail = typeof body.detail === "string" ? body.detail : detail;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail);
+  }
+
+  return res.json();
+}
+
+/**
+ * Delete a document by its database ID.
+ * Document owners and admins can delete.
+ */
+export async function deleteDocument(
+  docId: number,
+): Promise<DeleteDocumentResponse> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/v1/docs/${docId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(),
+    },
+  );
+
+  if (!res.ok) {
+    let detail = "Failed to delete document";
+    try {
+      const body = await res.json();
+      detail = typeof body.detail === "string" ? body.detail : detail;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail);
+  }
+
+  return res.json();
+}
+
 export async function fetchStats(): Promise<StatsResponse> {
   const url = `${API_BASE_URL}/api/v1/documents/stats`;
 

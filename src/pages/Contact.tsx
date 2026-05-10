@@ -4,7 +4,7 @@
 // ================================
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -95,11 +95,8 @@ const Contact = () => {
           {/* ================================
               🌍 TRANSLATION: Hero
              ================================ */}
-          <motion.div
-            className="text-center max-w-3xl mx-auto mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            className="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up animate-on-mount"
           >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
@@ -109,17 +106,13 @@ const Contact = () => {
             <p className="text-lg sm:text-xl text-muted-foreground">
               {t("pages.contact.hero.subtitle")}
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* ================================
                 🌍 TRANSLATION: Form
                ================================ */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+            <div className="animate-slide-in-left animate-on-mount">
               <div className="bg-card border border-border rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6">
                   {t("pages.contact.form.title")}
@@ -209,16 +202,13 @@ const Contact = () => {
                   </Button>
                 </form>
               </div>
-            </motion.div>
+            </div>
 
             {/* ================================
                 🌍 TRANSLATION: Info
                ================================ */}
-            <motion.div
-              className="space-y-8"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+            <div
+              className="space-y-8 animate-slide-in-right animate-on-mount"
             >
               <div>
                 <h2 className="text-2xl font-bold mb-6">
@@ -263,7 +253,7 @@ const Contact = () => {
                   {t("pages.contact.help.cta")}
                 </Button>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
