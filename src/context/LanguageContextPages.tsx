@@ -28,7 +28,7 @@ export const pageTranslations = {
     // Story
     "pages.about.story.title": "Our Story",
     "pages.about.story.p1":
-      "Nassaq began as a project from a team at the College of Artificial Intelligence who saw how difficult it is for most people to keep their documents organized in one place.",
+      "Nassaq began as a project from a team at the College of Artificial Intelligence who saw how difficult it is for most people to keep their documentsسسسس organized in one place.",
     "pages.about.story.p2":
       "We built Nassaq to help you archive your data and access every service you can imagine from a single platform.",
     "pages.about.story.p3":
