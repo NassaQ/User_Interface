@@ -4,7 +4,7 @@
 // ================================
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -101,11 +101,8 @@ const Billing = () => {
         {/* ================================
             🌍 TRANSLATION: Current Plan
            ================================ */}
-        <motion.div
-          className="bg-gradient-to-r from-primary via-accent to-primary p-[1px] rounded-2xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+        <div
+          className="bg-gradient-to-r from-primary via-accent to-primary p-[1px] rounded-2xl animate-fade-in-up animate-on-mount"
         >
           <div className="bg-card rounded-2xl p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -223,16 +220,12 @@ const Billing = () => {
               </span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* ================================
             🌍 TRANSLATION: Plans
            ================================ */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-        >
+        <div className="animate-fade-in-up animate-on-mount" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold">
               {t("pages.billing.availablePlans")}
@@ -267,19 +260,14 @@ const Billing = () => {
 
           <div className="grid md:grid-cols-3 gap-4">
             {plans.map((plan, index) => (
-              <motion.div
+              <div
                 key={plan.nameKey}
                 className={`relative bg-card border rounded-2xl p-6 ${
                   plan.current
                     ? "border-primary shadow-lg shadow-primary/10"
                     : "border-border hover:border-primary/30"
-                } transition-all`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.4,
-                  delay: 0.2 + index * 0.1,
-                }}
+                } transition-all animate-fade-in-up animate-on-mount`}
+                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
               >
                 {plan.current && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -331,19 +319,17 @@ const Billing = () => {
                       : "pages.billing.actions.upgrade"
                   )}
                 </Button>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* ================================
             🌍 TRANSLATION: History
            ================================ */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
+        <div
+          className="bg-card border border-border rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount"
+          style={{ animationDelay: '0.4s' }}
         >
           <div className="flex items-center justify-between p-5 border-b border-border">
             <div className="flex items-center gap-3">
@@ -390,7 +376,7 @@ const Billing = () => {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );

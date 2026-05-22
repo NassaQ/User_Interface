@@ -4,7 +4,7 @@
 // ================================
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { useInView } from "@/hooks/useInView";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -15,6 +15,12 @@ import { useLanguage } from "@/context/LanguageContext";
 const Pricing = () => {
   const { t } = useLanguage();
   const [isAnnual, setIsAnnual] = useState(true);
+
+  const { ref: ref0, inView: inView0 } = useInView<HTMLDivElement>({ once: true });
+  const { ref: ref1, inView: inView1 } = useInView<HTMLDivElement>({ once: true });
+  const { ref: ref2, inView: inView2 } = useInView<HTMLDivElement>({ once: true });
+  const planRefs = [ref0, ref1, ref2];
+  const planInViews = [inView0, inView1, inView2];
 
   const plans = [
     {
@@ -75,11 +81,8 @@ const Pricing = () => {
           {/* ================================
               🌍 TRANSLATION: Header
              ================================ */}
-          <motion.div
-            className="text-center max-w-3xl mx-auto mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            className="text-center max-w-3xl mx-auto mb-12 animate-fade-in-up animate-on-mount"
           >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
@@ -116,24 +119,22 @@ const Pricing = () => {
                 </span>
               </button>
             </div>
-          </motion.div>
+          </div>
 
           {/* ================================
               🌍 TRANSLATION: Plans
              ================================ */}
           <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {plans.map((plan, index) => (
-              <motion.div
+              <div
                 key={index}
+                ref={planRefs[index]}
                 className={`relative bg-card border rounded-3xl p-8 ${
                   plan.highlight
                     ? "border-primary shadow-2xl shadow-primary/20 scale-105 md:scale-110"
                     : "border-border hover:border-primary/50"
-                } transition-all`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                } transition-all animate-fade-in-up-lg ${planInViews[index] ? 'in-view' : ''}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {plan.highlight && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -193,7 +194,7 @@ const Pricing = () => {
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

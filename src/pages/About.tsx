@@ -3,7 +3,7 @@
 // Namespace: pages.about.*
 // ================================
 
-import { motion } from "framer-motion";
+import { useInView } from "@/hooks/useInView";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Target, Users, Award, Rocket } from "lucide-react";
@@ -11,12 +11,12 @@ import { useLanguage } from "@/context/LanguageContext";
 
 import nada from "../assets/photo_2025-11-24_11-02-19.jpg";
 import waly from "../assets/waly.jpg";
-import youssif from "../assets/yosifmohammed.jpg";
+import youssif from "../assets/yosifmohammed.webp";
 import ganna from "../assets/ganna.jpg";
 import alaa from "../assets/alaa.jpg";
 import sayed from "../assets/sayed.jpg";
-import osama from "../assets/Osama.jpg";
-import abdulrahman from "../assets/abdulrahman.png";
+import osama from "../assets/Osama.webp";
+import abdulrahman from "../assets/abdulrahman.webp";
 import yosifmohamed from "../assets/Yosifmohamed.jpeg"
 
 const About = () => {
@@ -93,6 +93,9 @@ const About = () => {
     },
   ];
 
+  const { ref: storyRef, inView: storyInView } = useInView<HTMLDivElement>({ once: true });
+  const { ref: teamTitleRef, inView: teamTitleInView } = useInView<HTMLHeadingElement>({ once: true });
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -104,12 +107,7 @@ const About = () => {
           {/* ================================
               🌍 TRANSLATION: Hero
              ================================ */}
-          <motion.div
-            className="text-center max-w-3xl mx-auto mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="text-center max-w-3xl mx-auto mb-20 animate-fade-in-up animate-on-mount">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
                 {t("pages.about.hero.title")}
@@ -118,38 +116,33 @@ const About = () => {
             <p className="text-lg sm:text-xl text-muted-foreground">
               {t("pages.about.hero.subtitle")}
             </p>
-          </motion.div>
+          </div>
 
           {/* ================================
               🌍 TRANSLATION: Values
              ================================ */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
             {values.map((value, index) => (
-              <motion.div
+              <div
                 key={index}
-                className="bg-card border border-border rounded-2xl p-8 hover:border-primary/50 transition-all hover:shadow-lg"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-card border border-border rounded-2xl p-8 hover:border-primary/50 transition-all hover:shadow-lg animate-fade-in-up-lg animate-on-mount"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mb-6">
                   <value.icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">{t(value.titleKey)}</h3>
                 <p className="text-muted-foreground">{t(value.descKey)}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
 
           {/* ================================
               🌍 TRANSLATION: Story
              ================================ */}
-          <motion.div
-            className="max-w-4xl mx-auto mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
+            ref={storyRef}
+            className={`max-w-4xl mx-auto mb-20 animate-fade-in-up ${storyInView ? 'in-view' : ''}`}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-center mb-12">
               {t("pages.about.story.title")}
@@ -157,36 +150,31 @@ const About = () => {
             <div className="space-y-6 text-lg text-muted-foreground">
               <p>{t("pages.about.story.p1")}</p>
             </div>
-          </motion.div>
+          </div>
 
           {/* ================================
               🌍 TRANSLATION: Team
              ================================ */}
           <div>
-            <motion.h2
-              className="text-3xl lg:text-4xl font-bold text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+            <h2
+              ref={teamTitleRef}
+              className={`text-3xl lg:text-4xl font-bold text-center mb-12 animate-fade-in-up ${teamTitleInView ? 'in-view' : ''}`}
             >
               {t("pages.about.team.title")}
-            </motion.h2>
+            </h2>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {team.map((member, index) => (
-                <motion.div
+                <div
                   key={index}
-                  className="text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="text-center animate-fade-in-up-lg animate-on-mount"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="relative mb-6 group">
                     <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-border group-hover:border-primary transition-all">
                       <img
                         src={member.image}
-                        alt={member.name}
+                        alt={t(member.nameKey)}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -197,7 +185,7 @@ const About = () => {
                   </h3>
 
                   <p className="text-muted-foreground">{t(member.roleKey)}</p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

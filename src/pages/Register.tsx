@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,11 +73,8 @@ const Register = () => {
         <LanguageToggle />
       </div>
 
-      <motion.div
-        className="w-full max-w-md mx-4 relative z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+      <div
+        className="w-full max-w-md mx-4 relative z-10 animate-fade-in-up animate-on-mount"
       >
         <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
           <Link to="/" className="flex items-center justify-center gap-2 mb-8">
@@ -220,7 +217,7 @@ const Register = () => {
             </Link>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

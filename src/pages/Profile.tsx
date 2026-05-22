@@ -5,7 +5,6 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -146,11 +145,8 @@ const Profile = () => {
     >
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl overflow-hidden mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+        <div
+          className="bg-card border border-border rounded-2xl overflow-hidden mb-6 animate-fade-in-up animate-on-mount"
         >
           {/* Cover */}
           <div className="h-32 bg-gradient-to-r from-primary via-accent to-primary" />
@@ -185,15 +181,12 @@ const Profile = () => {
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Personal Information */}
-          <motion.div
-            className="bg-card border border-border rounded-2xl p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+          <div
+            className="bg-card border border-border rounded-2xl p-6 animate-fade-in-up animate-on-mount delay-100"
           >
             <h3 className="text-lg font-semibold mb-6">
               {t("pages.profile.sections.personal")}
@@ -255,14 +248,11 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Work Information */}
-          <motion.div
-            className="bg-card border border-border rounded-2xl p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
+          <div
+            className="bg-card border border-border rounded-2xl p-6 animate-fade-in-up animate-on-mount delay-200"
           >
             <h3 className="text-lg font-semibold mb-6">
               {t("pages.profile.sections.work")}
@@ -313,16 +303,13 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Save / Cancel / Success / Error */}
         {editing && (
-          <motion.div
-            className="mt-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+          <div
+            className="mt-6 animate-fade-in-up animate-on-mount"
           >
             {saveError && (
               <div className="flex items-center gap-2 text-destructive mb-4 bg-destructive/10 px-4 py-3 rounded-xl">
@@ -343,17 +330,15 @@ const Profile = () => {
                 {t("pages.profile.actions.save")}
               </Button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {saveSuccess && !editing && (
-          <motion.div
-            className="mt-4 bg-green-500/10 text-green-600 px-4 py-3 rounded-xl text-sm font-medium text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+          <div
+            className="mt-4 bg-green-500/10 text-green-600 px-4 py-3 rounded-xl text-sm font-medium text-center animate-fade-in animate-on-mount"
           >
             Profile updated successfully!
-          </motion.div>
+          </div>
         )}
       </div>
     </DashboardLayout>

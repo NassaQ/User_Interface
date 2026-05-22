@@ -6,7 +6,6 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "./ui/button";
-import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
 const ThemeToggle = () => {
@@ -21,17 +20,17 @@ const ThemeToggle = () => {
       className="relative overflow-hidden"
       aria-label={t("theme.toggle.aria")}
     >
-      <motion.div
-        initial={false}
-        animate={{ rotate: theme === "dark" ? 180 : 0 }}
-        transition={{ duration: 0.3 }}
+      <div
+        className={`transition-transform duration-300 ${
+          theme === "dark" ? "rotate-180" : "rotate-0"
+        }`}
       >
         {theme === "light" ? (
           <Moon className="w-5 h-5" />
         ) : (
           <Sun className="w-5 h-5" />
         )}
-      </motion.div>
+      </div>
     </Button>
   );
 };

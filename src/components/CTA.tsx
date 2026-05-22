@@ -6,51 +6,41 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { useInView } from "@/hooks/useInView";
 
 const CTA = () => {
   const { t } = useLanguage();
+
+  const { ref: wrapperRef, inView: wrapperInView } = useInView<HTMLDivElement>({ once: true });
+  const { ref: badgeRef, inView: badgeInView } = useInView<HTMLDivElement>({ once: true });
+  const { ref: btnsRef, inView: btnsInView } = useInView<HTMLDivElement>({ once: true });
 
   return (
     <section className="py-20 lg:py-32 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-background" />
 
-      <motion.div
-        className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 5, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
-        transition={{ duration: 5, repeat: Infinity }}
-      />
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.div
-          className="max-w-4xl mx-auto text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+        <div
+          ref={wrapperRef}
+          className={`max-w-4xl mx-auto text-center animate-fade-in-up-lg ${wrapperInView ? 'in-view' : ''}`}
         >
           {/* ================================
               🌍 TRANSLATION: Badge
               Key: cta.section.badge
              ================================ */}
-          <motion.div
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 rounded-full px-4 py-2 mb-6"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+          <div
+            ref={badgeRef}
+            className={`inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 rounded-full px-4 py-2 mb-6 animate-fade-in-scale ${badgeInView ? 'in-view' : ''}`}
           >
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {t("cta.section.badge")}
             </span>
-          </motion.div>
+          </div>
 
           {/* ================================
               🌍 TRANSLATION: Title
@@ -70,12 +60,10 @@ const CTA = () => {
             {t("cta.section.description")}
           </p>
 
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+          <div
+            ref={btnsRef}
+            className={`flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up ${btnsInView ? 'in-view' : ''}`}
+            style={{ animationDelay: '0.2s' }}
           >
             <Link to="/register">
               {/* ================================
@@ -100,7 +88,7 @@ const CTA = () => {
                 {t("cta.section.actions.secondary")}
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
           {/* ================================
               🌍 TRANSLATION: Footer Note
@@ -109,7 +97,7 @@ const CTA = () => {
           <p className="text-sm text-muted-foreground mt-6">
             {t("cta.section.note")}
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

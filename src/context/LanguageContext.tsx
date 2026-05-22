@@ -26,14 +26,23 @@ const componentTranslations = {
     "dashboard.layout.brand": "Nassaq",
     "dashboard.layout.section.admin": "Admin area",
     "dashboard.layout.nav.dashboard": "Dashboard",
+    "dashboard.layout.nav.myFiles": "My Files",
     "dashboard.layout.nav.studio": "AI Studio",
     "dashboard.layout.nav.history": "History",
+    "dashboard.layout.nav.search": "Search & Chat",
     "dashboard.layout.nav.users": "Users",
     "dashboard.layout.nav.profile": "Profile",
     "dashboard.layout.nav.settings": "Settings",
     "dashboard.layout.nav.billing": "Billing",
     "dashboard.layout.nav.help": "Help",
     "dashboard.layout.actions.signOut": "Sign Out",
+
+    // Processing indicator
+    "dashboard.layout.processing.active": "Processing in background...",
+
+    // Global Search
+    "dashboard.header.search.placeholder": "Search your files...",
+    "dashboard.header.search.viewOriginal": "View original file",
 
     // ================================
     // CTA
@@ -176,14 +185,23 @@ const componentTranslations = {
     "dashboard.layout.brand": "نسّـق",
     "dashboard.layout.section.admin": "منطقة الإدارة",
     "dashboard.layout.nav.dashboard": "لوحة التحكم",
+    "dashboard.layout.nav.myFiles": "ملفاتي",
     "dashboard.layout.nav.studio": "استوديو الذكاء الاصطناعي",
     "dashboard.layout.nav.history": "السجل",
+    "dashboard.layout.nav.search": "البحث والدردشة",
     "dashboard.layout.nav.users": "المستخدمون",
     "dashboard.layout.nav.profile": "الملف الشخصي",
     "dashboard.layout.nav.settings": "الإعدادات",
     "dashboard.layout.nav.billing": "الفواتير",
     "dashboard.layout.nav.help": "المساعدة",
     "dashboard.layout.actions.signOut": "تسجيل الخروج",
+
+    // Processing indicator
+    "dashboard.layout.processing.active": "جاري المعالجة في الخلفية...",
+
+    // Global Search
+    "dashboard.header.search.placeholder": "ابحث في ملفاتك...",
+    "dashboard.header.search.viewOriginal": "عرض الملف الأصلي",
 
     // ================================
     // CTA

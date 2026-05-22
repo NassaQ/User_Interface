@@ -3,7 +3,7 @@
 // Namespace: pages.settings.*
 // ================================
 
-import { motion } from "framer-motion";
+
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -131,12 +131,10 @@ const Settings = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Settings Sections */}
         {settingsSections.map((section, sectionIndex) => (
-          <motion.div
+          <div
             key={section.titleKey}
-            className="bg-card border border-border rounded-2xl overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: sectionIndex * 0.1 }}
+            className="bg-card border border-border rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount"
+            style={{ animationDelay: `${sectionIndex * 0.1}s` }}
           >
             <div className="flex items-center gap-3 p-5 border-b border-border bg-secondary/30">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -185,15 +183,13 @@ const Settings = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         ))}
 
         {/* Security Section */}
-        <motion.div
-          className="bg-card border border-border rounded-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+        <div
+          className="bg-card border border-border rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount"
+          style={{ animationDelay: '0.3s' }}
         >
           <div className="flex items-center gap-3 p-5 border-b border-border bg-secondary/30">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -229,14 +225,12 @@ const Settings = () => {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Danger Zone */}
-        <motion.div
-          className="bg-card border border-destructive/30 rounded-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
+        <div
+          className="bg-card border border-destructive/30 rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount"
+          style={{ animationDelay: '0.4s' }}
         >
           <div className="flex items-center gap-3 p-5 border-b border-destructive/20 bg-destructive/5">
             <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
@@ -290,7 +284,7 @@ const Settings = () => {
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );
