@@ -1,0 +1,160 @@
+/* Page entrance & scroll-reveal animations */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up-lg {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hidden until animated (mount or scroll) */
+.animate-fade-in-up:not(.animate-on-mount):not(.in-view),
+.animate-fade-in-up-lg:not(.animate-on-mount):not(.in-view),
+.animate-fade-in:not(.animate-on-mount):not(.in-view),
+.animate-fade-in-scale:not(.animate-on-mount):not(.in-view),
+.animate-slide-in-left:not(.animate-on-mount):not(.in-view),
+.animate-slide-in-right:not(.animate-on-mount):not(.in-view),
+.animate-slide-down:not(.animate-on-mount):not(.in-view) {
+  opacity: 0;
+}
+
+.animate-fade-in-up.animate-on-mount,
+.animate-fade-in-up.in-view {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+.animate-fade-in-up-lg.animate-on-mount,
+.animate-fade-in-up-lg.in-view {
+  animation: fade-in-up-lg 0.7s ease-out both;
+}
+
+.animate-fade-in.animate-on-mount,
+.animate-fade-in.in-view {
+  animation: fade-in 0.5s ease-out both;
+}
+
+.animate-fade-in-scale.animate-on-mount,
+.animate-fade-in-scale.in-view {
+  animation: fade-in-scale 0.5s ease-out both;
+}
+
+.animate-slide-in-left.animate-on-mount,
+.animate-slide-in-left.in-view {
+  animation: slide-in-left 0.6s ease-out both;
+}
+
+.animate-slide-in-right.animate-on-mount,
+.animate-slide-in-right.in-view {
+  animation: slide-in-right 0.6s ease-out both;
+}
+
+.animate-slide-down.animate-on-mount,
+.animate-slide-down.in-view {
+  animation: slide-down 0.5s ease-out both;
+}
+
+.animate-on-mount {
+  animation-fill-mode: both;
+}
+
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.delay-700 {
+  animation-delay: 0.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-up-lg,
+  .animate-fade-in,
+  .animate-fade-in-scale,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-slide-down {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

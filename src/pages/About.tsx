@@ -11,13 +11,13 @@ import { useLanguage } from "@/context/LanguageContext";
 
 import nada from "../assets/photo_2025-11-24_11-02-19.jpg";
 import waly from "../assets/waly.jpg";
-import youssif from "../assets/yosifmohammed.webp";
+import youssif from "../assets/yosifmohammed.jpg";
 import ganna from "../assets/ganna.jpg";
 import alaa from "../assets/alaa.jpg";
 import sayed from "../assets/sayed.jpg";
-import osama from "../assets/Osama.webp";
-import abdulrahman from "../assets/abdulrahman.webp";
-import yosifmohamed from "../assets/Yosifmohamed.jpeg"
+import osama from "../assets/Osama.jpg";
+import abdulrahman from "../assets/abdulrahman.png";
+import yosifmohamed from "../assets/Yosifmohamed.jpeg";
 
 const About = () => {
   const { t } = useLanguage();
