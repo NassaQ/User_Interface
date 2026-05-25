@@ -126,7 +126,7 @@ const Studio = () => {
       title={t("pages.studio.title")}
       subtitle="Upload documents for OCR text extraction and AI classification"
     >
-      <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-180px)]">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 lg:min-h-[calc(100dvh-13rem)] lg:h-[calc(100dvh-13rem)]">
         {/* -- Left Panel: Upload -------------------------------- */}
         <div
           className="bg-card border border-border rounded-2xl flex flex-col overflow-hidden animate-slide-in-left animate-on-mount"

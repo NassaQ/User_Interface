@@ -125,3 +125,14 @@ All colors MUST be HSL.
 .prose li {
   @apply text-foreground/90;
 }
+
+/* Responsive helpers — used across dashboard pages */
+@layer utilities {
+  .table-scroll {
+    @apply w-full overflow-x-auto overscroll-x-contain;
+  }
+
+  .page-stack {
+    @apply flex w-full min-w-0 flex-col gap-4 sm:gap-6;
+  }
+}

@@ -240,8 +240,8 @@ const UsersTable = ({
     <div
       className="bg-card border border-border rounded-2xl overflow-hidden animate-fade-in-up animate-on-mount delay-100"
     >
-      <div className="hidden w-full sm:block">
-        <Table>
+      <div className="hidden w-full overflow-x-auto sm:block">
+        <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow className="bg-secondary/30">
               <TableHead className="w-10">

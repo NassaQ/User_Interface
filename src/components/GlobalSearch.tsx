@@ -71,7 +71,7 @@ const GlobalSearch = () => {
   };
 
   return (
-    <div ref={wrapperRef} className="relative hidden md:block flex-1 max-w-md mx-4">
+    <div ref={wrapperRef} className="relative w-full max-w-xl">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
