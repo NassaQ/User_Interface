@@ -1,145 +1,249 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ExternalLink, Loader2, Search } from "lucide-react";
+/**
+ * GlobalSearch — semantic search box in the Dashboard header.
+ *
+ * Features:
+ *   - 300ms debounce on typing
+ *   - Enter triggers immediate search
+ *   - Dropdown shows top 3 matching files with relevance %
+ *   - Click a result → opens original file in a new tab
+ *   - Each result shows: rank, filename, category badge, relevance, folder path
+ */
+
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { ragSearch, type SearchResultItem } from "@/services/rag.service";
+import { ragSearch } from "@/services/rag.service";
 import { viewOriginalFile } from "@/services/files.service";
-import { cn } from "@/lib/utils";
+import {
+  Search,
+  FileText,
+  Loader2,
+  ExternalLink,
+  FolderOpen,
+} from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/*  Category colours (mirrors dashboard & search page)                 */
+/* ------------------------------------------------------------------ */
+const CATEGORY_COLORS: Record<string, string> = {
+  Contracts:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Litigation:
+    "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  "Court Rulings":
+    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  Legislation:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  "Legal Opinions":
+    "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  Uncertain:
+    "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+};
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+interface SearchHit {
+  source_file: string;
+  classification: string;
+  score: number;
+  document_id: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 const GlobalSearch = () => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
+
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResultItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [results, setResults] = useState<SearchHit[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const runSearch = useCallback(async (q: string) => {
+  // ── Close dropdown on outside click ──────────────────────────────
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        inputRef.current &&
+        !inputRef.current.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // ── Perform search ───────────────────────────────────────────────
+  const doSearch = useCallback(async (q: string) => {
     const trimmed = q.trim();
-    if (trimmed.length < 2) {
+    if (!trimmed) {
       setResults([]);
-      setOpen(false);
+      setIsOpen(false);
       return;
     }
 
-    setLoading(true);
-    setOpen(true);
+    setIsSearching(true);
     try {
-      const res = await ragSearch({ query: trimmed, top_k: 6 });
-      setResults(res.results);
+      const resp = await ragSearch({ query: trimmed, top_k: 10 });
+
+      // Group chunks by document_id, keep best rerank_score per file
+      const fileMap = new Map<string, SearchHit>();
+      for (const item of resp.results) {
+        const existing = fileMap.get(item.document_id);
+        if (!existing || item.rerank_score > existing.score) {
+          fileMap.set(item.document_id, {
+            source_file: item.source_file,
+            classification: item.classification,
+            score: item.rerank_score,
+            document_id: item.document_id,
+          });
+        }
+      }
+
+      // Sort by score descending, take top 3
+      const top3 = Array.from(fileMap.values())
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+
+      setResults(top3);
+      setIsOpen(top3.length > 0);
     } catch {
       setResults([]);
+      setIsOpen(false);
     } finally {
-      setLoading(false);
+      setIsSearching(false);
     }
   }, []);
 
-  useEffect(() => {
+  // ── Input handler with 300ms debounce ────────────────────────────
+  const onInputChange = (value: string) => {
+    setQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => runSearch(query), 350);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, runSearch]);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = query.trim();
-    if (!trimmed) return;
-    setOpen(false);
-    navigate("/search", { state: { query: trimmed } });
+    debounceRef.current = setTimeout(() => doSearch(value), 300);
   };
 
-  const handleViewOriginal = async (documentId: string) => {
+  // ── Keyboard shortcuts ───────────────────────────────────────────
+  const onInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      doSearch(query);
+    }
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      inputRef.current?.blur();
+    }
+  };
+
+  // ── View original file ──────────────────────────────────────────
+  const handleViewFile = async (documentId: string) => {
     try {
       await viewOriginalFile(documentId);
     } catch {
-      /* file may not exist for older documents */
+      /* silent — file may not exist for older documents */
     }
   };
 
   return (
-    <div ref={wrapperRef} className="relative w-full max-w-xl">
-      <form onSubmit={handleSubmit}>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => query.trim().length >= 2 && setOpen(true)}
-            placeholder={t("dashboard.header.search.placeholder")}
-            className="w-full pl-9 pr-4 py-2 bg-secondary/50 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-          />
-          {loading && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-          )}
-        </div>
-      </form>
+    <div className="relative flex-1 max-w-xs lg:max-w-sm xl:max-w-md mx-2 sm:mx-4">
+      {/* Search input */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => onInputChange(e.target.value)}
+          onKeyDown={onInputKeyDown}
+          onFocus={() => {
+            if (results.length > 0) setIsOpen(true);
+          }}
+          placeholder={t("dashboard.header.search.placeholder")}
+          className="w-full h-9 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+          dir="auto"
+        />
+        {isSearching && (
+          <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+        )}
+      </div>
 
-      {open && query.trim().length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden animate-fade-in animate-on-mount">
-          {loading && results.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground text-center">…</p>
-          ) : results.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground text-center">
-              {t("pages.dashboard.search.noResults")}
-            </p>
-          ) : (
-            <ul className="max-h-72 overflow-y-auto py-1">
-              {results.map((item, index) => (
-                <li
-                  key={`${item.document_id}-${item.page_number}-${index}`}
-                  className="px-3 py-2 hover:bg-secondary/50 transition-colors"
-                >
+      {/* Dropdown results */}
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden"
+        >
+          {results.map((file, idx) => {
+            const pct = Math.round(Math.min(file.score, 1) * 100);
+            return (
+              <div
+                key={file.document_id}
+                className="flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors cursor-pointer border-b border-border/50 last:border-b-0"
+                onClick={() => handleViewFile(file.document_id)}
+              >
+                {/* Rank badge */}
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-bold text-primary">
+                    {idx + 1}
+                  </span>
+                </div>
+
+                {/* File info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <FileText className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <span className="text-sm font-medium text-foreground truncate max-w-[160px]">
+                      {file.source_file}
+                    </span>
+                    {file.classification && (
+                      <span
+                        className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 ${
+                          CATEGORY_COLORS[file.classification] ??
+                          CATEGORY_COLORS.Uncertain
+                        }`}
+                      >
+                        {file.classification}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate flex items-center gap-1">
+                    <FolderOpen className="w-3 h-3 flex-shrink-0" />
+                    <span>
+                      {file.classification
+                        ? `${file.classification.toLowerCase()}/${file.source_file}`
+                        : file.source_file}
+                    </span>
+                  </p>
+                </div>
+
+                {/* Score + view button */}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className="text-sm font-bold text-primary w-9 text-right">
+                    {pct}%
+                  </span>
                   <button
-                    type="button"
-                    className="w-full text-left"
-                    onClick={() => {
-                      setOpen(false);
-                      navigate("/search", { state: { query: query.trim() } });
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewFile(file.document_id);
                     }}
+                    className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary transition-colors"
+                    title={t("dashboard.header.search.viewOriginal")}
                   >
-                    <p className="text-sm font-medium truncate">{item.source_file}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                      {(item.text_original || item.text).slice(0, 120)}
-                    </p>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </button>
-                  {item.document_id && (
-                    <button
-                      type="button"
-                      onClick={() => handleViewOriginal(item.document_id)}
-                      className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      {t("dashboard.header.search.viewOriginal")}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            type="button"
-            onClick={() => navigate("/search", { state: { query: query.trim() } })}
-            className={cn(
-              "w-full border-t border-border px-3 py-2 text-xs text-primary hover:bg-secondary/30 transition-colors text-center",
-            )}
-          >
-            {t("pages.dashboard.search.viewAll")}
-          </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

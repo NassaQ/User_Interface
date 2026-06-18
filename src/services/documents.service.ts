@@ -35,6 +35,7 @@ export interface PageDiagnostic {
 }
 
 export interface ClassificationInfo {
+  domain: string;
   category: string;
   confidence: number;
   reasoning: string;
@@ -74,6 +75,7 @@ export interface HistoryItem {
   doc_id: number;
   document_id: string;
   filename: string;
+  domain: string;
   category: string;
   confidence: number;
   page_count: number;
@@ -93,6 +95,7 @@ export interface StatsResponse {
   total_cost_usd: number;
   avg_confidence: number;
   avg_processing_time: number;
+  domains: Record<string, number>;
   categories: Record<string, number>;
   languages: Record<string, number>;
 }
@@ -167,6 +170,7 @@ export async function fetchHistory(
 /* ------------------------------------------------------------------ */
 
 export interface MoveDocumentRequest {
+  new_domain: string;
   new_category: string;
 }
 
@@ -175,6 +179,7 @@ export interface MoveDocumentResponse {
   filename: string;
   old_path: string;
   new_path: string;
+  new_domain: string;
   new_category: string;
   message: string;
 }
@@ -190,6 +195,7 @@ export interface DeleteDocumentResponse {
  */
 export async function moveDocument(
   docId: number,
+  newDomain: string,
   newCategory: string,
 ): Promise<MoveDocumentResponse> {
   const res = await fetch(
@@ -200,7 +206,7 @@ export async function moveDocument(
         ...authHeaders(),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ new_category: newCategory }),
+      body: JSON.stringify({ new_domain: newDomain, new_category: newCategory }),
     },
   );
 

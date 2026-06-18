@@ -93,12 +93,36 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     setIsProcessing(true);
     setError(null);
     setResult(null);
+    setIngested(false);
+    setIngestError(null);
+    setIngestChunks(0);
 
     try {
       const res = await processDocument(selectedFile);
       setResult(res);
       if (!res.success) {
         setError(res.error || "Processing failed");
+        return;
+      }
+      // Auto-ingest to knowledge base after successful processing
+      try {
+        const resp = await ragIngest({
+          document_id: res.document_id,
+          cleaned_text: res.cleaned_text || res.extracted_text,
+          tables_markdown: res.tables_markdown ?? [],
+          domain: res.classification?.domain ?? "",
+          classification: res.classification?.category ?? "",
+          language: res.primary_language ?? "unknown",
+          source_file: res.filename,
+        });
+        setIngested(true);
+        setIngestChunks(resp.chunks_created);
+      } catch (ingestErr) {
+        setIngestError(
+          ingestErr instanceof Error
+            ? ingestErr.message
+            : "Failed to save to knowledge base",
+        );
       }
     } catch (err) {
       setError(
@@ -125,6 +149,7 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
         document_id: documentId,
         cleaned_text: result.cleaned_text || result.extracted_text,
         tables_markdown: result.tables_markdown ?? [],
+        domain: result.classification?.domain ?? "",
         classification: result.classification?.category ?? "",
         language: result.primary_language ?? "unknown",
         source_file: result.filename,

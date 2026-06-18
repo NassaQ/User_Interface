@@ -42,6 +42,7 @@ export interface SearchResultItem {
   source_file: string;
   page_number: number;
   section_heading: string;
+  domain: string;
   classification: string;
   language: string;
   faiss_score: number;
@@ -53,6 +54,7 @@ export interface SearchResultItem {
 export interface SearchRequest {
   query: string;
   top_k?: number;
+  filter_domain?: string | null;
   filter_classification?: string | null;
   filter_language?: string | null;
   filter_document_id?: string | null;
@@ -69,6 +71,7 @@ export interface SearchResponse {
 export interface AskRequest {
   query: string;
   top_k?: number;
+  filter_domain?: string | null;
   filter_classification?: string | null;
   filter_language?: string | null;
   filter_document_id?: string | null;
@@ -87,6 +90,7 @@ export interface IngestRequest {
   document_id: string;
   cleaned_text: string;
   tables_markdown?: string[];
+  domain?: string;
   classification?: string;
   language?: string;
   source_file?: string;
@@ -106,6 +110,7 @@ export interface DocumentInfo {
   document_id: string;
   chunks_count: number;
   source_file: string;
+  domain: string;
   classification: string;
   language: string;
 }

@@ -1,9 +1,13 @@
-/* Page entrance & scroll-reveal animations */
+/* ==========================================================================
+   NassaQ — CSS Animation Utilities
+   Replaces framer-motion for common animation patterns (fade, slide, scale)
+   ========================================================================== */
 
-@keyframes fade-in-up {
+/* --- Keyframes -------------------------------------------------------- */
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -11,10 +15,10 @@
   }
 }
 
-@keyframes fade-in-up-lg {
+@keyframes fadeInUpLg {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -22,7 +26,7 @@
   }
 }
 
-@keyframes fade-in {
+@keyframes fadeIn {
   from {
     opacity: 0;
   }
@@ -31,10 +35,10 @@
   }
 }
 
-@keyframes fade-in-scale {
+@keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
@@ -42,10 +46,10 @@
   }
 }
 
-@keyframes slide-in-left {
+@keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-32px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -53,10 +57,10 @@
   }
 }
 
-@keyframes slide-in-right {
+@keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -64,10 +68,10 @@
   }
 }
 
-@keyframes slide-down {
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-16px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -75,76 +79,120 @@
   }
 }
 
-/* Hidden until animated (mount or scroll) */
-.animate-fade-in-up:not(.animate-on-mount):not(.in-view),
-.animate-fade-in-up-lg:not(.animate-on-mount):not(.in-view),
-.animate-fade-in:not(.animate-on-mount):not(.in-view),
-.animate-fade-in-scale:not(.animate-on-mount):not(.in-view),
-.animate-slide-in-left:not(.animate-on-mount):not(.in-view),
-.animate-slide-in-right:not(.animate-on-mount):not(.in-view),
-.animate-slide-down:not(.animate-on-mount):not(.in-view) {
-  opacity: 0;
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
-.animate-fade-in-up.animate-on-mount,
-.animate-fade-in-up.in-view {
-  animation: fade-in-up 0.6s ease-out both;
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
-.animate-fade-in-up-lg.animate-on-mount,
-.animate-fade-in-up-lg.in-view {
-  animation: fade-in-up-lg 0.7s ease-out both;
-}
+/* --- Utility Classes -------------------------------------------------- */
 
-.animate-fade-in.animate-on-mount,
-.animate-fade-in.in-view {
-  animation: fade-in 0.5s ease-out both;
-}
-
-.animate-fade-in-scale.animate-on-mount,
-.animate-fade-in-scale.in-view {
-  animation: fade-in-scale 0.5s ease-out both;
-}
-
-.animate-slide-in-left.animate-on-mount,
-.animate-slide-in-left.in-view {
-  animation: slide-in-left 0.6s ease-out both;
-}
-
-.animate-slide-in-right.animate-on-mount,
-.animate-slide-in-right.in-view {
-  animation: slide-in-right 0.6s ease-out both;
-}
-
-.animate-slide-down.animate-on-mount,
-.animate-slide-down.in-view {
-  animation: slide-down 0.5s ease-out both;
-}
-
+/* Base animation setup */
 .animate-on-mount {
   animation-fill-mode: both;
 }
 
-.delay-100 {
-  animation-delay: 0.1s;
+/* Fade in + slide up (20px) — most common pattern */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
 }
 
-.delay-200 {
-  animation-delay: 0.2s;
+/* Fade in + slide up (30px) — for scroll-reveal sections */
+.animate-fade-in-up-lg {
+  animation: fadeInUpLg 0.6s ease-out both;
 }
 
-.delay-300 {
-  animation-delay: 0.3s;
+/* Simple fade in */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
 }
 
-.delay-500 {
-  animation-delay: 0.5s;
+/* Fade in + scale */
+.animate-fade-in-scale {
+  animation: fadeInScale 0.5s ease-out both;
 }
 
-.delay-700 {
-  animation-delay: 0.7s;
+/* Slide in from left */
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s ease-out both;
 }
 
+/* Slide in from right */
+.animate-slide-in-right {
+  animation: slideInRight 0.5s ease-out both;
+}
+
+/* Slide down */
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out both;
+}
+
+/* --- Scroll-triggered (in-view) animations --------------------------- */
+.in-view.animate-fade-in-up,
+.in-view.animate-fade-in-up-lg,
+.in-view.animate-fade-in,
+.in-view.animate-fade-in-scale,
+.in-view.animate-slide-in-left,
+.in-view.animate-slide-in-right {
+  /* Play animation when .in-view class is added via IntersectionObserver */
+  animation-play-state: running;
+}
+
+.animate-fade-in-up,
+.animate-fade-in-up-lg,
+.animate-fade-in,
+.animate-fade-in-scale,
+.animate-slide-in-left,
+.animate-slide-in-right {
+  animation-play-state: paused;
+}
+
+/* Override for mount animations (start immediately) */
+.animate-on-mount.animate-fade-in-up,
+.animate-on-mount.animate-fade-in-up-lg,
+.animate-on-mount.animate-fade-in,
+.animate-on-mount.animate-fade-in-scale,
+.animate-on-mount.animate-slide-in-left,
+.animate-on-mount.animate-slide-in-right {
+  animation-play-state: running;
+}
+
+/* --- Animation Delays ------------------------------------------------- */
+.delay-100  { animation-delay: 0.1s; }
+.delay-200  { animation-delay: 0.2s; }
+.delay-300  { animation-delay: 0.3s; }
+.delay-400  { animation-delay: 0.4s; }
+.delay-500  { animation-delay: 0.5s; }
+.delay-600  { animation-delay: 0.6s; }
+.delay-700  { animation-delay: 0.7s; }
+.delay-800  { animation-delay: 0.8s; }
+.delay-900  { animation-delay: 0.9s; }
+.delay-1000 { animation-delay: 1.0s; }
+
+/* --- Exit Animations (for AnimatePresence replacement) ---------------- */
+.exit-fade-out {
+  animation: fadeOut 0.2s ease-out both;
+}
+
+.exit-fade-out-up {
+  animation: fadeOutUp 0.2s ease-out both;
+}
+
+/* --- Reduced Motion --------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .animate-fade-in-up-lg,
@@ -152,7 +200,13 @@
   .animate-fade-in-scale,
   .animate-slide-in-left,
   .animate-slide-in-right,
-  .animate-slide-down {
+  .animate-slide-down,
+  .in-view.animate-fade-in-up,
+  .in-view.animate-fade-in-up-lg,
+  .in-view.animate-fade-in,
+  .in-view.animate-fade-in-scale,
+  .in-view.animate-slide-in-left,
+  .in-view.animate-slide-in-right {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

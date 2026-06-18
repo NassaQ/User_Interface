@@ -77,19 +77,18 @@ interface ChatMessage {
 /* ------------------------------------------------------------------ */
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Culture:
-    "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  Finance:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  Medical: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  Politics:
-    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Religion:
+  Contracts:
     "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  Sports:
-    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  Technology:
-    "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
+  Litigation:
+    "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  "Court Rulings":
+    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  Legislation:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  "Legal Opinions":
+    "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  Uncertain:
+    "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
 };
 
 /* ------------------------------------------------------------------ */
@@ -253,6 +252,7 @@ const Search = () => {
   const [removingId, setRemovingId] = useState<string | null>(null);
 
   // ── Shared filters ────────────────────────────────────────────
+  const [filterDomain, setFilterDomain] = useState<string | null>(null);
   const [filterClassification, setFilterClassification] = useState<
     string | null
   >(null);
@@ -308,6 +308,7 @@ const Search = () => {
       const resp: AskResponse = await ragAsk({
         query,
         top_k: 5,
+        filter_domain: filterDomain,
         filter_classification: filterClassification,
         filter_language: filterLanguage,
         filter_document_id: filterDocumentId,
@@ -351,6 +352,7 @@ const Search = () => {
       const resp = await ragSearch({
         query,
         top_k: 10,
+        filter_domain: filterDomain,
         filter_classification: filterClassification,
         filter_language: filterLanguage,
         filter_document_id: filterDocumentId,

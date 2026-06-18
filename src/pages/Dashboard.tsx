@@ -133,13 +133,11 @@ const Dashboard = () => {
 
   // Category color helper
   const categoryColors: Record<string, string> = {
-    Technology: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    Finance: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    Medical: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-    Politics: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    Sports: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-    Culture: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-    Religion: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
+    Contracts: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    Litigation: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+    "Court Rulings": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    Legislation: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    "Legal Opinions": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
     Uncertain: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
   };
 
@@ -213,44 +211,57 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* ── Category & Language Distribution ───────────────────── */}
+          {/* ── Domain & Category Distribution ───────────────────── */}
           {(categoryEntries.length > 0 || languageEntries.length > 0) && (
             <div
               className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 animate-fade-in-up animate-on-mount"
               style={{ animationDelay: '0.45s' }}
             >
-              {/* Categories */}
+              {/* Domains + Categories */}
               {categoryEntries.length > 0 && (
                 <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <BarChart3 className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold">{t("pages.dashboard.categories")}</h3>
+                    <h3 className="font-semibold">{t("pages.dashboard.domains.label")}</h3>
                   </div>
-                  <div className="space-y-3">
-                    {categoryEntries.map(([cat, count]) => {
-                      const total = stats!.total_documents;
-                      const pct = total > 0 ? (count / total) * 100 : 0;
-                      return (
-                        <div key={cat}>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${categoryColors[cat] ?? categoryColors.Uncertain}`}
-                            >
-                              {cat}
-                            </span>
-                            <span className="text-muted-foreground">
-                              {count} ({pct.toFixed(0)}%)
-                            </span>
-                          </div>
-                          <div className="w-full bg-secondary rounded-full h-2">
-                            <div
-                              className="bg-primary rounded-full h-2 transition-all duration-500"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="space-y-4">
+                    {/* Domain: Law */}
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                          {t("pages.dashboard.domains.law")}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {categoryEntries.reduce((sum, [, c]) => sum + c, 0)}
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 ml-3 mt-2">
+                        {categoryEntries.map(([cat, count]) => {
+                          const total = stats!.total_documents;
+                          const pct = total > 0 ? (count / total) * 100 : 0;
+                          return (
+                            <div key={cat}>
+                              <div className="flex justify-between text-xs mb-0.5">
+                                <span
+                                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[cat] ?? categoryColors.Uncertain}`}
+                                >
+                                  {cat}
+                                </span>
+                                <span className="text-muted-foreground">
+                                  {count} ({pct.toFixed(0)}%)
+                                </span>
+                              </div>
+                              <div className="w-full bg-secondary rounded-full h-1.5">
+                                <div
+                                  className="bg-primary rounded-full h-1.5 transition-all duration-500"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
