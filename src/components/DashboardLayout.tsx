@@ -127,9 +127,7 @@ const DashboardLayout = ({
       >
         <div className="p-6 h-full flex flex-col">
           <Link to="/" className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img src="/logo.png" alt="Nassaq" className="w-9 h-9 object-contain" />
 
             {/* ================================
                 🌍 TRANSLATION: Brand
@@ -254,7 +252,7 @@ const DashboardLayout = ({
               <ThemeToggle />
               <LanguageToggle />
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold text-sm">
-                {initials}
+                <img src="/logo.png" alt="Admin" className="w-full h-full object-contain p-1 bg-white rounded-full" />
               </div>
             </div>
           </div>

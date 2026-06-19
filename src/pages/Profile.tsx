@@ -156,7 +156,7 @@ const Profile = () => {
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-3xl font-bold text-primary-foreground border-4 border-card">
-                  {initials}
+                  <img src="/logo.png" alt="Admin" className="w-full h-full object-contain p-2 bg-white rounded-xl" />
                 </div>
                 <button className="absolute bottom-0 right-0 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
                   <Camera className="w-4 h-4 text-muted-foreground" />

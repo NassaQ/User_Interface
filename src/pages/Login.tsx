@@ -55,9 +55,7 @@ const Login = () => {
       >
         <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
           <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center">
-              <Zap className="w-7 h-7 text-white" />
-            </div>
+            <img src="/logo.png" alt="Nassaq" className="w-10 h-10 object-contain" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {t("brand.name")}
             </span>

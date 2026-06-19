@@ -54,9 +54,7 @@ const Navbar = () => {
               to="/"
               className="flex items-center gap-2 text-xl lg:text-2xl font-bold"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center shadow-lg">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
+              <img src="/logo.png" alt="Nassaq" className="w-9 h-9 object-contain" />
 
               {/* ================================
                   🌍 TRANSLATION: Brand

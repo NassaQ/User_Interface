@@ -188,7 +188,7 @@ export async function ragIngest(body: IngestRequest): Promise<IngestResponse> {
  * List all ingested documents.
  */
 export async function ragListDocuments(): Promise<DocumentInfo[]> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/rag/documents`, {
+  const res = await fetch(`${API_BASE_URL}/api/v1/rag/`, {
     headers: authHeaders(),
   });
 
@@ -207,7 +207,7 @@ export async function ragRemoveDocument(
   documentId: string,
 ): Promise<RemoveResponse> {
   const res = await fetch(
-    `${API_BASE_URL}/api/v1/rag/documents/${encodeURIComponent(documentId)}`,
+    `${API_BASE_URL}/api/v1/rag/doc/${encodeURIComponent(documentId)}`,
     {
       method: "DELETE",
       headers: authHeaders(),

@@ -182,7 +182,7 @@ const componentTranslations = {
     // ================================
     // DashboardLayout
     // ================================
-    "dashboard.layout.brand": "نسّـق",
+    "dashboard.layout.brand": "نسَّق",
     "dashboard.layout.section.admin": "منطقة الإدارة",
     "dashboard.layout.nav.dashboard": "لوحة التحكم",
     "dashboard.layout.nav.myFiles": "ملفاتي",
@@ -209,7 +209,7 @@ const componentTranslations = {
     "cta.section.badge": "ابدأ تجربتك المجانية",
     "cta.section.title": "جاهز لتحويل طريقة عملك؟",
     "cta.section.description":
-      "انضم إلى آلاف الفرق التي تستخدم نسّـق لأتمتة سير العمل وزيادة الإنتاجية.",
+      "انضم إلى آلاف الفرق التي تستخدم نسَّق لأتمتة سير العمل وزيادة الإنتاجية.",
     "cta.section.actions.primary": "ابدأ مجانًا",
     "cta.section.actions.secondary": "تواصل مع المبيعات",
     "cta.section.note":
@@ -246,7 +246,7 @@ const componentTranslations = {
     // ================================
     // Footer
     // ================================
-    "footer.brand": "نسّـق",
+    "footer.brand": "نسَّق",
     "footer.description":
       "تمكين الشركات بحلول مدعومة بالذكاء الاصطناعي لعالم الأعمال الحديث.",
     "footer.rights": "جميع الحقوق محفوظة",
@@ -317,7 +317,7 @@ const componentTranslations = {
     // ================================
     // Navbar
     // ================================
-    "navbar.brand": "نسّـق",
+    "navbar.brand": "نسَّق",
     "navbar.links.home": "الرئيسية",
     "navbar.links.about": "من نحن",
     "navbar.links.pricing": "الأسعار",

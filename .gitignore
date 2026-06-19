@@ -25,3 +25,8 @@ dist-ssr
 
 # bun lock
 bun.lockb
+
+.azure/
+.env
+.env.production
+deploy_pkg/
