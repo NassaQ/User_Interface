@@ -123,10 +123,6 @@ const HowItWorks = () => {
                      ================================ */}
                   <p className="text-muted-foreground">{t(step.descKey)}</p>
                 </div>
-
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-primary to-accent" />
-                )}
               </div>
             ))}
           </div>

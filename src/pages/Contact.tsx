@@ -70,17 +70,17 @@ const Contact = () => {
     {
       icon: Mail,
       titleKey: "pages.contact.info.email",
-      value: "ahes64033@gmail.com",
+      value: "info@Nassaq.tech",
     },
     {
       icon: Phone,
       titleKey: "pages.contact.info.phone",
-      value: "+20 1033689664",
+      value: "+201061633587",
     },
     {
       icon: MapPin,
       titleKey: "pages.contact.info.location",
-      value: "123 AI Street, Tech City, TC 12345",
+      value: "Smart Village, Giza, Egypt",
     },
   ];
 
@@ -226,18 +226,6 @@ const Contact = () => {
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* Office Hours */}
-              <div className="bg-card border border-border rounded-2xl p-8">
-                <h3 className="text-xl font-bold mb-4">
-                  {t("pages.contact.hours.title")}
-                </h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <p>{t("pages.contact.hours.weekdays")}</p>
-                  <p>{t("pages.contact.hours.saturday")}</p>
-                  <p>{t("pages.contact.hours.sunday")}</p>
                 </div>
               </div>
 

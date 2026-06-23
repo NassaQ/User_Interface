@@ -48,9 +48,9 @@ const componentTranslations = {
     // CTA
     // ================================
     "cta.section.badge": "Start Your Free Trial",
-    "cta.section.title": "Ready to Transform Your Workflow?",
+    "cta.section.title": "Ready to Experience Smarter Document Management?",
     "cta.section.description":
-      "Join thousands of teams already using Nassaq to automate their workflows and boost productivity.",
+      "Join thousands of organizations using Nassaq to organize, classify, and instantly retrieve their documents with AI.",
     "cta.section.actions.primary": "Get Started Free",
     "cta.section.actions.secondary": "Contact Sales",
     "cta.section.note":
@@ -62,29 +62,29 @@ const componentTranslations = {
     "features.section.badge": "Powerful Features",
     "features.section.title": "Everything you need to succeed",
 
-    "features.cards.ai.title": "AI-Powered Intelligence",
+    "features.cards.ai.title": "AI Document Classification",
     "features.cards.ai.desc":
-      "Advanced machine learning algorithms that adapt to your workflow",
+      "Automatically classify and tag your documents using advanced AI - no manual sorting needed",
 
-    "features.cards.fast.title": "Lightning Fast",
+    "features.cards.fast.title": "Instant Search & Retrieval",
     "features.cards.fast.desc":
-      "Process thousands of operations in milliseconds with optimized performance",
+      "Find any document in seconds using semantic search powered by AI - search by meaning, not just keywords",
 
-    "features.cards.security.title": "Enterprise Security",
+    "features.cards.security.title": "Secure Document Storage",
     "features.cards.security.desc":
-      "Bank-level encryption and compliance with global security standards",
+      "Your documents are stored securely on Azure with enterprise-grade encryption and access control",
 
-    "features.cards.analytics.title": "Real-time Analytics",
+    "features.cards.analytics.title": "Chat with Your Documents",
     "features.cards.analytics.desc":
-      "Gain actionable insights with comprehensive data visualization",
+      "Ask questions about your documents in natural language and get accurate AI-powered answers with sources",
 
-    "features.cards.team.title": "Team Collaboration",
+    "features.cards.team.title": "Team & Role Management",
     "features.cards.team.desc":
-      "Work together seamlessly with powerful collaboration tools",
+      "Manage your team with role-based access control - admins, users, and custom permissions",
 
-    "features.cards.global.title": "Global Scale",
+    "features.cards.global.title": "OCR & Multi-language Support",
     "features.cards.global.desc":
-      "Deploy anywhere in the world with multi-region support",
+      "Extract text from scanned documents and images with OCR, supporting Arabic and English content",
 
     // ================================
     // Footer
@@ -122,10 +122,10 @@ const componentTranslations = {
     // ================================
     // Hero
     // ================================
-    "hero.section.badge": "AI-Powered Platform",
-    "hero.title": "Transform Your Workflow with AI",
+    "hero.section.badge": "AI-Powered Document Management",
+    "hero.title": "Manage Your Documents with AI Intelligence",
     "hero.subtitle":
-      "Powerful AI-driven solutions to streamline your business operations and boost productivity",
+      "Upload, classify, search, and chat with your documents using advanced AI - all in one secure platform",
     "hero.cta.primary": "Get Started Free",
     "hero.cta.secondary": "Watch Demo",
 
@@ -137,21 +137,21 @@ const componentTranslations = {
     "how.section.subtitle":
       "Simple four-step process to transform your workflow",
 
-    "how.steps.connect.title": "Connect Your Data",
+    "how.steps.connect.title": "Upload Your Documents",
     "how.steps.connect.desc":
-      "Seamlessly integrate with your existing tools and data sources",
+      "Upload any document - PDFs, scanned files, or images - and Nassaq handles the rest",
 
-    "how.steps.process.title": "AI Processing",
+    "how.steps.process.title": "AI Classification & OCR",
     "how.steps.process.desc":
-      "Our AI analyzes and processes your data with advanced algorithms",
+      "Our AI automatically extracts text, classifies documents, and organizes them by category",
 
-    "how.steps.insights.title": "Get Insights",
+    "how.steps.insights.title": "Search & Chat",
     "how.steps.insights.desc":
-      "Receive actionable insights and automated recommendations",
+      "Search semantically or chat with your documents to get instant answers with source citations",
 
-    "how.steps.action.title": "Take Action",
+    "how.steps.action.title": "Manage & Collaborate",
     "how.steps.action.desc":
-      "Implement changes and watch your productivity soar",
+      "Share documents with your team, control access, and track all activity in one place",
 
     // ================================
     // Language Toggle
@@ -207,9 +207,9 @@ const componentTranslations = {
     // CTA
     // ================================
     "cta.section.badge": "ابدأ تجربتك المجانية",
-    "cta.section.title": "جاهز لتحويل طريقة عملك؟",
+    "cta.section.title": "هل أنت مستعد لإدارة مستنداتك بشكل أذكى؟",
     "cta.section.description":
-      "انضم إلى آلاف الفرق التي تستخدم نسَّق لأتمتة سير العمل وزيادة الإنتاجية.",
+      "انضم إلى المؤسسات التي تستخدم نسَّق لتنظيم مستنداتها وتصنيفها واسترجاعها فورًا بالذكاء الاصطناعي.",
     "cta.section.actions.primary": "ابدأ مجانًا",
     "cta.section.actions.secondary": "تواصل مع المبيعات",
     "cta.section.note":
@@ -221,27 +221,24 @@ const componentTranslations = {
     "features.section.badge": "ميزات قوية",
     "features.section.title": "كل ما تحتاجه للنجاح",
 
-    "features.cards.ai.title": "ذكاء مدعوم بالذكاء الاصطناعي",
-    "features.cards.ai.desc": "خوارزميات تعلم آلي متقدمة تتكيف مع سير عملك",
+    "features.cards.ai.title": "تصنيف المستندات بالذكاء الاصطناعي",
+    "features.cards.ai.desc": "صنّف مستنداتك تلقائيًا بالذكاء الاصطناعي دون الحاجة لفرز يدوي",
 
-    "features.cards.fast.title": "أداء فائق السرعة",
+    "features.cards.fast.title": "بحث واسترجاع فوري",
     "features.cards.fast.desc":
-      "تنفيذ آلاف العمليات في أجزاء من الثانية بأداء محسّن",
+      "ابحث عن أي مستند في ثوانٍ بالبحث الدلالي - ابحث بالمعنى لا بالكلمات فقط",
 
-    "features.cards.security.title": "أمان بمستوى المؤسسات",
+    "features.cards.security.title": "تخزين آمن للمستندات",
     "features.cards.security.desc":
-      "تشفير بمستوى البنوك والالتزام بمعايير الأمان العالمية",
+      "مستنداتك محفوظة بأمان على Azure بتشفير احترافي وتحكم كامل في الوصول",
 
-    "features.cards.analytics.title": "تحليلات لحظية",
+    "features.cards.analytics.title": "تحدّث مع مستنداتك",
     "features.cards.analytics.desc":
-      "احصل على رؤى عملية من خلال تصور شامل للبيانات",
+      "اسأل أسئلة عن مستنداتك بلغة طبيعية واحصل على إجابات دقيقة مع المصادر",
 
-    "features.cards.team.title": "تعاون الفريق",
-    "features.cards.team.desc": "اعملوا معًا بسلاسة باستخدام أدوات تعاون قوية",
-
-    "features.cards.global.title": "انتشار عالمي",
-    "features.cards.global.desc":
-      "انشر خدماتك في أي مكان في العالم مع دعم متعدد المناطق",
+    "features.cards.team.desc": "أدِر فريقك بصلاحيات مخصصة - مسؤولون ومستخدمون وتحكم كامل في الوصول",
+    "features.cards.global.title": "OCR ودعم متعدد اللغات",
+    "features.cards.global.desc": "استخرج النصوص من المستندات الممسوحة والصور مع دعم كامل للعربية والإنجليزية",
 
     // ================================
     // Footer
@@ -279,10 +276,10 @@ const componentTranslations = {
     // ================================
     // Hero
     // ================================
-    "hero.section.badge": "منصة مدعومة بالذكاء الاصطناعي",
-    "hero.title": "حوّل سير عملك مع الذكاء الاصطناعي",
+    "hero.section.badge": "إدارة المستندات بالذكاء الاصطناعي",
+    "hero.title": "أدِر مستنداتك بذكاء اصطناعي متقدم",
     "hero.subtitle":
-      "حلول قوية مدعومة بالذكاء الاصطناعي لتبسيط عمليات عملك وتعزيز الإنتاجية",
+      "ارفع، صنّف، ابحث، وتحدّث مع مستنداتك باستخدام الذكاء الاصطناعي - كل ذلك في منصة آمنة وموحّدة",
     "hero.cta.primary": "ابدأ مجانًا",
     "hero.cta.secondary": "شاهد العرض",
 
@@ -293,20 +290,19 @@ const componentTranslations = {
     "how.section.title": "ابدأ خلال دقائق",
     "how.section.subtitle": "عملية بسيطة من أربع خطوات لتحويل طريقة عملك",
 
-    "how.steps.connect.title": "اربط بياناتك",
-    "how.steps.connect.desc": "تكامل سلس مع أدواتك الحالية ومصادر البيانات",
+    "how.steps.connect.title": "ارفع مستنداتك",
+    "how.steps.connect.desc": "ارفع أي مستند - PDF أو صور أو ملفات ممسوحة - ونسَّق يتولى الباقي",
 
-    "how.steps.process.title": "معالجة بالذكاء الاصطناعي",
+    "how.steps.process.title": "تصنيف بالذكاء الاصطناعي و OCR",
     "how.steps.process.desc":
-      "يقوم الذكاء الاصطناعي لدينا بتحليل بياناتك ومعالجتها بخوارزميات متقدمة",
+      "يستخرج الذكاء الاصطناعي النصوص ويصنف المستندات ويرتبها تلقائيًا حسب الفئة",
 
-    "how.steps.insights.title": "احصل على رؤى",
+    "how.steps.insights.title": "ابحث وتحدّث",
     "how.steps.insights.desc":
-      "استقبل توصيات عملية وآلية تساعدك على اتخاذ القرار",
+      "ابحث دلاليًا أو تحدّث مع مستنداتك للحصول على إجابات فورية مع المصادر",
 
-    "how.steps.action.title": "اتخذ الإجراء",
-    "how.steps.action.desc": "نفّذ التغييرات وشاهد إنتاجيتك ترتفع",
-
+    "how.steps.action.title": "أدِر وتعاون",
+    "how.steps.action.desc": "شارك المستندات مع فريقك، تحكم في الوصول، وتابع كل النشاطات في مكان واحد",
     // ================================
     // Language Toggle
     // ================================

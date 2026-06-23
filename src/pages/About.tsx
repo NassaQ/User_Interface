@@ -148,7 +148,7 @@ const About = () => {
               {t("pages.about.story.title")}
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground">
-              <p>{t("pages.about.story.p1")}</p>
+              <p className="text-center">{t("pages.about.story.p1")}</p>
             </div>
           </div>
 
